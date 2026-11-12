@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>守护五周年 · 应援防线</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- 顶栏 HUD：应援值 / 波次 / 耐久 / 击杀 / 下一波 / 倍速 / 暂停 / 静音 -->
+    <div id="topbar">
+      <div class="tb-left">
+        <img src="assets/logo.png" alt="A-SOUL">
+        <span class="tb-title">守护五周年 · 应援防线</span>
+      </div>
+      <div class="tb-stats">
+        <span class="stat gold">应援值<b id="hud-gold">220</b></span>
+        <span class="stat">波次<b id="hud-wave">1 / 15</b></span>
+        <span class="stat lives">耐久<b id="hud-lives">10</b></span>
+        <span class="stat">击杀<b id="hud-kills">0</b></span>
+      </div>
+      <div class="tb-btns">
+        <button id="btn-next" class="btn small">开始防守!</button>
+        <button id="btn-speed" class="btn small ghost">倍速 x1</button>
+        <button id="btn-pause" class="btn small ghost">暂停 (P)</button>
+        <button id="btn-mute" class="btn small ghost">音效:开 (M)</button>
+      </div>
+    </div>
+
+    <!-- 舞台（canvas 960x640） -->
+    <div id="stage-wrap">
+      <canvas id="game" width="960" height="640"></canvas>
+
+      <!-- 塔信息面板：升级 / 卖出 -->
+      <div id="tower-panel" class="hidden">
+        <img id="tp-avatar" src="assets/tower_bella.png" alt="">
+        <div id="tp-info">
+          <div id="tp-name">塔</div>
+          <div id="tp-stats">-</div>
+        </div>
+        <button id="tp-up" class="btn small">升级</button>
+        <button id="tp-sell" class="btn small ghost">卖出</button>
+      </div>
+
+      <!-- 主菜单 -->
+      <div id="overlay-menu" class="overlay">
+        <div class="menu-box">
+          <img class="menu-logo" src="assets/logo.png" alt="A-SOUL">
+          <h1 class="menu-title">守护五周年 · 应援防线</h1>
+          <p class="menu-sub">虚无与小黑子想吹灭舞台的灯——布下五人应援塔，守住这场演唱会！<br>
+            （塔防需要全阵容：默认三人组领衔，心宜 &amp; 思诺二期应援登场）</p>
+          <div class="menu-btns">
+            <button id="btn-start" class="btn big">开始游戏</button>
+            <button id="btn-codex-tower" class="btn ghost">五塔图鉴</button>
+            <button id="btn-codex-enemy" class="btn ghost">敌人图鉴</button>
+            <button id="btn-help" class="btn ghost">操作说明</button>
+            <button id="btn-mute-menu" class="btn ghost">音效：开</button>
+          </div>
+          <div class="menu-parade">
+            <img src="assets/menu_bella.png" alt="贝拉">
+            <img src="assets/menu_diana.png" alt="嘉然">
+            <img src="assets/menu_eileen.png" alt="乃琳">
+            <img src="assets/menu_xindian.png" alt="嘉心糖">
+            <img src="assets/fun_tuola.png" alt="拖拉机下山">
+            <img src="assets/fun_biu.png" alt="biu">
+            <img src="assets/fun_mua.png" alt="mua">
+            <img src="assets/acao_keai.png" alt="阿草">
+          </div>
+          <p class="menu-foot">A-SOUL 同人非商用小游戏 ｜ 借鉴《保卫萝卜》等经典塔防 ｜ 素材来自 A-SOUL 二创素材库</p>
+        </div>
+      </div>
+
+      <!-- 五塔图鉴 -->
+      <div id="overlay-towers" class="overlay hidden">
+        <div class="codex-box">
+          <h2>五塔图鉴</h2>
+          <p class="codex-tip">点击空地建造，点击塔升级（最高 3 级）或卖出（返还 70%）。</p>
+          <div id="codex-tower-list" class="cards"></div>
+          <div class="row" style="margin-top:14px">
+            <button id="btn-back-tower" class="btn">返回菜单</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 敌人图鉴 -->
+      <div id="overlay-enemies" class="overlay hidden">
+        <div class="codex-box">
+          <h2>敌人图鉴</h2>
+          <p class="codex-tip">「虚无」与「小黑子」想吹灭舞台灯光，别放它们上台！</p>
+          <div id="codex-enemy-list" class="cards"></div>
+          <div class="row" style="margin-top:14px">
+            <button id="btn-back-enemy" class="btn">返回菜单</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 操作说明 -->
+      <div id="overlay-help" class="overlay hidden">
+        <div class="codex-box">
+          <h2>操作说明</h2>
+          <div id="help-list"></div>
+          <div class="row" style="margin-top:14px">
+            <button id="btn-back-help" class="btn">返回菜单</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 结算（胜利 / 失败） -->
+      <div id="overlay-result" class="overlay hidden">
+        <div class="panel result-box">
+          <img id="res-img" src="assets/acao_kaixin.png" alt="">
+          <h2 id="res-title">演唱会照常开演！</h2>
+          <div id="res-stars" class="res-stars">★★★</div>
+          <p id="res-quote"></p>
+          <div id="res-stats"></div>
+          <div class="row">
+            <button id="btn-restart" class="btn">再来一次</button>
+            <button id="btn-back-menu" class="btn ghost">返回菜单</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 暂停 -->
+      <div id="overlay-pause" class="overlay hidden">
+        <div class="panel">
+          <h2>暂停中</h2>
+          <p>灯还亮着，虚无在等你。（P / Esc 继续）</p>
+          <div class="row">
+            <button id="btn-resume" class="btn">继续防守</button>
+            <button id="btn-pause-restart" class="btn ghost">重新开始</button>
+            <button id="btn-pause-menu" class="btn ghost">返回菜单</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

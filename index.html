@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-SOUL 同人小游戏库 · 枝江游乐厅</title>
+<style>
+  :root {
+    --bella: #DB7D74; --diana: #E799B0; --eileen: #576690;
+    --fiona: #C93773; --sinuo: #7252C0; --group: #8AA4FF;
+    --bg1: #1b1430; --bg2: #241a3f;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: radial-gradient(1200px 600px at 20% -10%, #3a2b5e 0%, transparent 60%),
+                radial-gradient(1000px 500px at 90% 110%, #2b1f4d 0%, transparent 55%),
+                linear-gradient(160deg, var(--bg1), var(--bg2));
+    color: #f3eefc;
+    padding: 48px 24px 64px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 40px; }
+  header h1 {
+    font-size: 40px; letter-spacing: 6px;
+    background: linear-gradient(90deg, var(--bella), var(--diana), var(--group), var(--sinuo));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 30px rgba(138,164,255,.18);
+  }
+  header .sub { margin-top: 10px; color: #b9a9d9; font-size: 15px; letter-spacing: 2px; }
+  .dots { margin-top: 14px; display: flex; gap: 10px; justify-content: center; }
+  .dots i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px currentColor; }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 22px;
+  }
+  a.card {
+    display: block; text-decoration: none; color: inherit;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 16px; padding: 22px 22px 18px;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    position: relative; overflow: hidden;
+  }
+  a.card:hover {
+    transform: translateY(-4px);
+    border-color: var(--c);
+    box-shadow: 0 10px 28px rgba(0,0,0,.35), 0 0 18px color-mix(in srgb, var(--c) 35%, transparent);
+  }
+  .card .tag {
+    position: absolute; top: 14px; right: 14px;
+    font-size: 11px; color: #d9cff0; background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.18); padding: 3px 10px; border-radius: 999px;
+  }
+  .card h2 { font-size: 20px; margin-bottom: 4px; color: #fff; }
+  .card .en { font-size: 11px; color: #a794c9; letter-spacing: 1px; margin-bottom: 10px; }
+  .card p { font-size: 13.5px; line-height: 1.75; color: #cfc3e6; min-height: 66px; }
+  .card .bar {
+    margin-top: 14px; height: 4px; border-radius: 4px;
+    background: linear-gradient(90deg, var(--c), transparent 85%);
+  }
+  .members { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .members span {
+    font-size: 11.5px; padding: 3px 9px; border-radius: 999px;
+    color: #efe8ff; background: color-mix(in srgb, var(--c) 30%, rgba(255,255,255,.06));
+    border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+  }
+  .play {
+    margin-top: 16px; font-size: 13px; color: var(--c); font-weight: bold; letter-spacing: 1px;
+  }
+  footer {
+    margin-top: 46px; text-align: center; color: #8e7fb0; font-size: 12.5px; line-height: 2;
+  }
+  footer b { color: #b7a8d9; }
+  .howto {
+    max-width: 760px; margin: 0 auto 34px; padding: 16px 22px;
+    background: rgba(255,255,255,.05); border: 1px dashed rgba(255,255,255,.2); border-radius: 12px;
+    color: #c6b8e2; font-size: 13.5px; line-height: 2; text-align: center;
+  }
+  .howto kbd {
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
+    border-radius: 5px; padding: 1px 7px; font-size: 12px; color: #fff;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>枝江游乐厅</h1>
+    <div class="sub">A-SOUL 同人小游戏库 · 致敬 4399 经典玩法 · 每个子文件夹是一款独立游戏</div>
+    <div class="dots">
+      <i style="color:var(--bella);background:var(--bella)"></i>
+      <i style="color:var(--diana);background:var(--diana)"></i>
+      <i style="color:var(--eileen);background:var(--eileen)"></i>
+      <i style="color:var(--fiona);background:var(--fiona)"></i>
+      <i style="color:var(--sinuo);background:var(--sinuo)"></i>
+    </div>
+  </header>
+
+  <div class="howto">
+    双击任意卡片下方的 <kbd>进入游戏</kbd> 或直接打开各文件夹里的 <kbd>index.html</kbd> 即可游玩（无需服务器）。<br>
+    游戏内 <kbd>P</kbd> 暂停 · <kbd>M</kbd> 静音 · <kbd>R</kbd> 重开，最高分自动保存在浏览器本地。
+  </div>
+
+  <div class="grid">
+    <a class="card" href="snackClaw/index.html" style="--c:var(--diana)">
+      <div class="tag">黄金矿工式</div>
+      <h2>一个魂零食大作战</h2>
+      <div class="en">SNACK CLAW</div>
+      <p>深夜零食掉满地，钟摆钩爪抓个够。凑齐「今日菜单」订单才能过关，周一到周日七天菜单越来越刁钻；小心汽水罐炸弹，还要提防阿草偷吃你的背包！</p>
+      <div class="members"><span>嘉然</span><span>贝拉</span><span>乃琳</span><span>阿草</span></div>
+      <div class="bar"></div>
+      <div class="play">▶ 进入游戏</div>
+    </a>
+
+    <a class="card" href="practiceTower/index.html" style="--c:var(--bella)">
+      <div class="tag">魔塔式</div>
+      <h2>加练魔塔</h2>
+      <div class="en">PRACTICE TOWER</div>
+      <p>「每人加练一天！」练习大楼 21 层被惰怠魔壬占领，三人组谁带队由你决定。经典数值攻防、钥匙开路、Queen 商店补给，一路杀上天台点亮聚光灯。</p>
+      <div class="members"><span>贝拉</span><span>嘉然</span><span>乃琳</span><span>心宜</span><span>思诺</span></div>
+      <div class="bar"></div>
+      <div class="play">▶ 进入游戏</div>
+    </a>
+
+    <a class="card" href="fireWater_duo/index.html" style="--c:var(--sinuo)">
+      <div class="tag">森林冰火人式</div>
+      <h2>闪耀双人舞台 · 冰火协奏</h2>
+      <div class="en">FIRE &amp; WATER STAGE</div>
+      <p>一人键盘双人协作：红莲组免疫火光、沧海组免疫水镜，从两组各选一位搭档登台。踏板、拉杆、推音箱、聚光灯冻桥……8+1 个关卡缺一不可。</p>
+      <div class="members"><span>贝拉</span><span>嘉然</span><span>乃琳</span><span>心宜</span><span>思诺</span></div>
+      <div class="bar"></div>
+      <div class="play">▶ 进入游戏</div>
+    </a>
+
+    <a class="card" href="pac_night/index.html" style="--c:var(--eileen)">
+      <div class="tag">吃豆人式</div>
+      <h2>一个魂 · 购物之夜</h2>
+      <div class="en">PAC NIGHT</div>
+      <p>午夜商场打烊前，收走全场珠宝豆！三位小黑子和凑热闹的阿草在巡逻，吃下「甜蜜陷阱」宝石就能反杀——Queen 的购物车，今晚谁也拦不住。</p>
+      <div class="members"><span>贝拉</span><span>嘉然</span><span>乃琳</span><span>心宜</span><span>思诺</span><span>阿草</span></div>
+      <div class="bar"></div>
+      <div class="play">▶ 进入游戏</div>
+    </a>
+
+    <a class="card" href="guardTour_td/index.html" style="--c:var(--fiona)">
+      <div class="tag">保卫萝卜式</div>
+      <h2>守护五周年 · 应援防线</h2>
+      <div class="en">GUARD TOUR TD</div>
+      <p>虚无与小黑子想吹灭五周年的舞台灯！布下五人应援塔：贝拉激光、嘉然蛋糕减速、乃琳魅惑光环、心宜劲舞冲击、思诺贯穿音波，守满 15 波让演唱会照常开演。</p>
+      <div class="members"><span>全员</span><span>阿草</span></div>
+      <div class="bar"></div>
+      <div class="play">▶ 进入游戏</div>
+    </a>
+
+    <a class="card" href="ppt_asoul/index.html" style="--c:var(--group)">
+      <div class="tag">泡泡堂式</div>
+      <h2>枝江泡泡堂</h2>
+      <div class="en">PPT ASOUL</div>
+      <p>经典泡泡对战：放水泡炸开礼盒、消灭捣乱的阿草，锤子敲晕近身对手。支持 1~8 个 AI 同场混战，三档难度，道具乱斗其乐无穷。</p>
+      <div class="members"><span>全员</span><span>阿草</span></div>
+      <div class="bar"></div>
+      <div class="play">▶ 进入游戏</div>
+    </a>
+  </div>
+
+  <footer>
+    <b>A-SOUL 同人作品 · 非商用</b>，与 A-SOUL 制作委员会 / 乐华娱乐无隶属关系。<br>
+    角色立绘与表情包来自本地素材库 <b>asoulResources</b>（官方物料粉丝归档），玩法灵感致敬 4399 经典小游戏并做了 IP 化原创改造。<br>
+    角色形象版权归 A-SOUL 制作委员会及原始创作者所有，素材仅供学习交流，请勿用于商业用途。
+  </footer>
+</div>
+</body>
+</html>

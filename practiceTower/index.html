@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>加练魔塔 · A-SOUL 练习大楼 21 层</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 主容器：标题界面 与 游戏界面 二选一显示 -->
+  <div id="app">
+    <div id="title" class="title-screen"></div>
+    <div id="game-wrap">
+      <canvas id="cv" width="728" height="640"></canvas>
+      <aside id="side"></aside>
+    </div>
+    <!-- 通用覆盖层：对话框 / 战斗 / 商店 / 图鉴 / 暂停 / 结局 -->
+    <div id="overlay" style="display:none"></div>
+  </div>
+
+  <!-- 经典 script 顺序引入：先数据后引擎 -->
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

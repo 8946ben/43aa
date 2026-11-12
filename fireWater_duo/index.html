@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=980">
+<title>闪耀双人舞台 · 冰火协奏</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage-wrap">
+  <!-- 游戏画布:960x640,内部再缩放适配 -->
+  <canvas id="game" width="960" height="640"></canvas>
+
+  <!-- 菜单覆盖层(标题/搭档/选关/说明/暂停),游戏进行中隐藏 -->
+  <div id="overlay">
+    <div class="screen" id="screen-main">
+      <img class="logo" src="assets/asoul_logo.png" alt="A-SOUL">
+      <h1 class="title"><span class="t-main">闪耀双人舞台</span><span class="t-sub"><b class="t-ice">冰</b><b class="t-fire">火</b>协奏</span></h1>
+      <div class="member-strip">
+        <div class="ms-group">
+          <div class="ms-label fire">红莲组 · 火</div>
+          <div class="ms-cards" id="ms-fire"></div>
+        </div>
+        <div class="ms-vs">✕</div>
+        <div class="ms-group">
+          <div class="ms-label water">沧海组 · 水</div>
+          <div class="ms-cards" id="ms-water"></div>
+        </div>
+      </div>
+      <p class="lead">双人同屏协作平台解谜 —— 从两组各选一位搭档登台;暖色即火,冷色即水;出口之门,缺一不可。</p>
+      <div class="btn-row">
+        <button class="btn big" id="btn-start">▶ 选择搭档 · 开演</button>
+        <button class="btn" id="btn-select">关卡选择</button>
+        <button class="btn" id="btn-help">玩法说明</button>
+      </div>
+      <div class="keys-hint">
+        <span class="k fire-k">红莲侧 W A S D</span>
+        <span class="k ice-k">沧海侧 ↑ ↓ ← →</span>
+        <span class="k">P 暂停</span><span class="k">R 重开</span><span class="k">M 静音</span>
+      </div>
+      <div class="foot">同人非商用 · 素材来自 A-SOUL 官方物料 · 灵感致敬 4399《森林冰火人》</div>
+    </div>
+
+    <div class="screen hidden" id="screen-partner">
+      <h2>选 择 搭 档</h2>
+      <div class="partner-cols">
+        <div class="p-group">
+          <div class="p-group-title fire-t">红莲组 · 火(免疫红色火光池)</div>
+          <div class="p-cards" id="fire-cards"></div>
+        </div>
+        <div class="p-group">
+          <div class="p-group-title water-t">沧海组 · 水(免疫蓝色水池)</div>
+          <div class="p-cards" id="water-cards"></div>
+        </div>
+      </div>
+      <p class="combo-line" id="combo-line"></p>
+      <p class="combo-quote" id="combo-quote"></p>
+      <p class="combo-note">嘉然虽是粉色系,但"暖色 = 火",属红莲组 · 组合只换外观,关卡谜题完全一致</p>
+      <div class="btn-row">
+        <button class="btn big" id="btn-partner-go">确认搭档 · 开始演出</button>
+        <button class="btn back" id="btn-partner-back">返回</button>
+      </div>
+    </div>
+
+    <div class="screen hidden" id="screen-select">
+      <h2>选 择 舞 台</h2>
+      <div id="level-grid"></div>
+      <p class="select-tip" id="select-tip"></p>
+      <button class="btn back" id="btn-select-back">返回</button>
+    </div>
+
+    <div class="screen hidden" id="screen-help">
+      <h2>玩 法 说 明</h2>
+      <div class="help-wrap">
+        <div class="help-col">
+          <div class="help-box">
+            <h3>双人操作(同屏双人)</h3>
+            <table class="op-table">
+              <tr><th class="th-fire">红莲侧(火)</th><th class="th-ice">沧海侧(水)</th><th>动作</th></tr>
+              <tr><td>A / D</td><td>← / →</td><td>左右移动</td></tr>
+              <tr><td>W</td><td>↑</td><td>跳跃(长按跳更高)</td></tr>
+              <tr><td>S</td><td>↓</td><td>从单向平台落下</td></tr>
+              <tr><td colspan="2">靠近机关轻触</td><td>扳动杠杆</td></tr>
+              <tr><td colspan="2">P 暂停 · R 重开 · M 静音</td><td>全局</td></tr>
+            </table>
+          </div>
+          <div class="help-box">
+            <h3>成员图鉴(6 种搭档组合)</h3>
+            <ul class="roster" id="roster"></ul>
+          </div>
+        </div>
+        <div class="help-col">
+          <div class="help-box">
+            <h3>舞台规则</h3>
+            <ul class="rule-list">
+              <li><b class="c-fire">红色火光池</b>:红莲组免疫,沧海组碰即败</li>
+              <li><b class="c-ice">蓝色水池</b>:沧海组免疫,红莲组碰即败</li>
+              <li><b class="c-void">绿色虚无液</b>:两人都碰不得</li>
+              <li>碰到致命液体后<b>本关重开</b>,收集品一并重置</li>
+              <li>红音符只有<b class="c-fire">红莲侧</b>能吃;蓝星光只有<b class="c-ice">沧海侧</b>能吃</li>
+              <li>嘉然虽是粉色系,<b>暖色 = 火</b>,属红莲组</li>
+              <li>全收集 = 3 星;累计 <b>18 星</b>解锁隐藏第 9 关</li>
+              <li>两人<b>各自站上自己应援色的出口门</b>即过关</li>
+            </ul>
+          </div>
+          <div class="help-box">
+            <h3>机关图鉴</h3>
+            <ul class="rule-list">
+              <li><b>压力踏板</b>:踩住生效(金色=踩住型,青色=触发后永久)</li>
+              <li><b>拉杆</b>:轻触切换,常用于红蓝桥与聚光灯</li>
+              <li><b>红蓝桥</b>:拉杆切换,同组桥梁实/虚互换</li>
+              <li><b>音箱</b>:可推箱子,垫脚上高台 / 压住踏板</li>
+              <li><b>聚光灯</b>:点亮时把光区内的水池冻结成冰桥</li>
+              <li><b>风扇</b>:站进气流区,被托举升空</li>
+              <li><b>单向平台</b>:可从下方跳穿,从上方站立;按"下"落下</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <button class="btn back" id="btn-help-back">返回</button>
+    </div>
+
+    <div class="screen hidden" id="screen-pause">
+      <h2>暂 停 中</h2>
+      <p class="lead">幕间休息 ~ 阿草去泡茶了</p>
+      <div class="btn-col">
+        <button class="btn big" id="btn-resume">继续演出</button>
+        <button class="btn" id="btn-restart">重开本关 (R)</button>
+        <button class="btn" id="btn-quit">返回选关</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

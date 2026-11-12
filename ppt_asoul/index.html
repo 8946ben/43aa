@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>枝江泡泡堂 · A-SOUL 同人单机版</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="wrap">
+  <header>
+    <h1>枝江泡泡堂</h1>
+    <div id="hud">
+      <span id="hud-char"></span>
+      <span id="hud-lives"></span>
+      <span>关卡 <b id="hud-level">1</b>/3 ・ <b id="hud-diff">中等</b></span>
+      <span>分数 <b id="hud-score">0</b></span>
+      <span>最高 <b id="hud-best">0</b></span>
+      <span>阿草 <b id="hud-enemies">0</b></span>
+      <span class="stats">泡<b id="hud-bombs">1</b> 焰<b id="hud-range">2</b> 速<b id="hud-speed">1</b> 锤<b id="hud-hammer">0</b></span>
+      <button id="btn-mute" title="声音开关 (M)">♪</button>
+    </div>
+  </header>
+  <div id="stage">
+    <canvas id="cv" width="720" height="624"></canvas>
+    <div id="overlay" class="hidden"></div>
+    <div id="menu">
+      <h2>选择你的成员</h2>
+      <p class="sub">放水泡炸开礼物盒，消灭捣乱的阿草！</p>
+      <div id="cards"></div>
+      <div id="settings">
+        <label title="单机版：人类玩家固定 1 名">玩家数量
+          <select id="sel-players" disabled><option value="1" selected>1（单机）</option></select>
+        </label>
+        <label>AI 数量
+          <select id="sel-ai">
+            <option value="1">1</option><option value="2">2</option><option value="3" selected>3</option>
+            <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+            <option value="7">7</option><option value="8">8</option>
+          </select>
+        </label>
+        <label>AI 难度
+          <select id="sel-diff">
+            <option value="easy">简单</option>
+            <option value="medium" selected>中等</option>
+            <option value="hard">困难</option>
+          </select>
+        </label>
+      </div>
+      <button id="btn-start" disabled>开始游戏</button>
+      <div class="help">
+        <p>移动 <kbd>方向键</kbd> / <kbd>WASD</kbd> ・ 放水泡 <kbd>空格</kbd> / <kbd>J</kbd> ・ 锤子敲击 <kbd>K</kbd> ・ 暂停 <kbd>P</kbd> / <kbd>Esc</kbd>（可返回主页）</p>
+        <p>道具：<i class="it it-speed"></i>加速 ・ <i class="it it-bomb"></i>水泡+1 ・ <i class="it it-range"></i>水花+1 ・ <i class="it it-hammer"></i>锤子+3 次（近身敲晕 3 秒；炸盒掉落，每关保底 4 个）</p>
+        <p>阿草也会放<b style="color:#f78fb0">红色水泡</b>、抢道具、用锤子敲人；身体接触不扣血，水花伤害双方，锤击眩晕双方。</p>
+        <p class="note">同人作品，玩法致敬经典泡泡堂；素材来自 asoulResources。</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

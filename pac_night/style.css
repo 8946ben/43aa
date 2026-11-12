@@ -1,0 +1,307 @@
+/* ========================================================================
+ * 一个魂 · 购物之夜 —— 样式
+ * 深夜商场配色：深蓝底 + 霓虹描边 + 成员应援色点缀
+ * ======================================================================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  background: #07081a;
+  color: #dfe3ff;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  min-height: 100%;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 8px;
+}
+
+/* ---------------- HUD ---------------- */
+#hud {
+  width: 546px;
+  max-width: 96vw;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  background: #10132e;
+  border: 1px solid #2a2f5e;
+  border-radius: 8px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+.hud-block { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.hud-block b { color: #ffd27a; }
+.hud-flex { flex: 1; }
+.hud-btn {
+  background: #1a1f45;
+  color: #dfe3ff;
+  border: 1px solid #3a4180;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.hud-btn:hover { background: #262c5c; }
+
+.life-dot {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.75);
+  margin-right: 3px;
+}
+.life-none { color: #6a6f9e; font-size: 12px; }
+
+#hudFx { display: none; flex-direction: column; gap: 2px; min-width: 130px; }
+#fxLabel { font-size: 11px; color: #cfd4ff; }
+.fx-track { width: 130px; height: 6px; background: #1a1f45; border-radius: 3px; overflow: hidden; }
+#fxBar { height: 100%; width: 0; border-radius: 3px; transition: width 0.1s linear; }
+
+/* ---------------- 舞台 ---------------- */
+#stage {
+  position: relative;
+  width: 546px;
+  max-width: 96vw;
+}
+#game {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #0b0d20;
+  border: 2px solid #2a2f5e;
+  border-radius: 8px;
+}
+
+/* ---------------- 覆盖层通用 ---------------- */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 14px;
+  background: rgba(7, 8, 26, 0.88);
+  border-radius: 8px;
+  z-index: 5;
+}
+.screen.hidden { display: none; }
+
+/* ---------------- 主菜单 ---------------- */
+#menuLogo {
+  width: 130px;
+  height: auto;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 10px rgba(90, 110, 240, 0.6));
+}
+.game-title {
+  font-size: 30px;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, #ff9ab5, #ffd27a, #8fb0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 24px rgba(255, 180, 200, 0.25);
+}
+.game-sub { font-size: 12px; color: #9aa2d8; margin: 6px 0 10px; text-align: center; }
+
+.scorebar {
+  display: flex;
+  gap: 18px;
+  font-size: 13px;
+  background: #10132e;
+  border: 1px solid #2a2f5e;
+  border-radius: 8px;
+  padding: 6px 14px;
+  margin-bottom: 10px;
+}
+.scorebar b { color: #ffd27a; }
+
+.sec-title { font-size: 14px; color: #aeb6e8; margin-bottom: 8px; letter-spacing: 2px; }
+
+/* 选人卡 */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 520px;
+}
+.card {
+  width: 96px;
+  background: #10132e;
+  border: 2px solid #2a2f5e;
+  border-radius: 10px;
+  padding: 7px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+.card:hover { transform: translateY(-3px); }
+.card.selected {
+  border-color: #ffd27a;
+  box-shadow: 0 0 14px rgba(255, 210, 122, 0.45);
+  transform: translateY(-3px);
+}
+.card.locked { opacity: 0.72; cursor: not-allowed; filter: grayscale(0.75); }
+.card-img {
+  position: relative;
+  width: 64px; height: 64px;
+  margin: 0 auto 5px;
+  border: 2px solid;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1a1f45;
+}
+.card-img.round { border-radius: 50%; background: #fff; }
+.card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card-lock {
+  position: absolute;
+  inset: auto 0 0 0;
+  background: rgba(7,8,26,0.78);
+  color: #ffd27a;
+  font-size: 10px;
+  padding: 1px 0;
+}
+.card-name { font-size: 14px; font-weight: bold; }
+.card-name small { font-size: 10px; color: #8a90b8; font-weight: normal; }
+.card-role { font-size: 10px; color: #9aa2d8; margin: 2px 0; }
+.card-passive {
+  font-size: 10px;
+  color: #cfd4ff;
+  min-height: 40px;
+  line-height: 1.35;
+}
+.card-quote { font-size: 9px; color: #8a90b8; margin-top: 3px; }
+.card-progress { margin-top: 4px; }
+.card-progress .bar {
+  height: 6px;
+  background: #1a1f45;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.card-progress .fill { height: 100%; }
+.prog-txt { font-size: 9px; color: #9aa2d8; margin-top: 2px; }
+
+/* 按钮 */
+.big-btn {
+  margin: 12px 0 4px;
+  padding: 10px 34px;
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: #12142e;
+  background: linear-gradient(90deg, #ffd27a, #ff9ab5);
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(255, 180, 150, 0.4);
+}
+.big-btn:hover { filter: brightness(1.1); }
+.mid-btn {
+  margin: 6px 0;
+  padding: 7px 22px;
+  font-size: 13px;
+  color: #dfe3ff;
+  background: #1a1f45;
+  border: 1px solid #3a4180;
+  border-radius: 18px;
+  cursor: pointer;
+}
+.mid-btn:hover { background: #262c5c; }
+
+/* 操作说明 */
+.help-box {
+  margin-top: 12px;
+  width: 500px;
+  max-width: 94%;
+  background: #10132e;
+  border: 1px solid #2a2f5e;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #b9bfe8;
+  line-height: 1.55;
+}
+.help-box b { color: #ffd27a; display: block; margin: 6px 0 3px; }
+.help-box b:first-child { margin-top: 0; }
+.help-table { border-collapse: collapse; width: 100%; }
+.help-table td { padding: 1px 6px 1px 0; vertical-align: top; }
+.help-table td:first-child { color: #8fb0ff; white-space: nowrap; }
+.help-ul { padding-left: 16px; }
+.help-ul li { margin: 2px 0; }
+.help-ul b { display: inline; color: #ff9ab5; }
+
+/* ---------------- 过场 ---------------- */
+.cut-panel { text-align: center; }
+.cut-level { font-size: 20px; color: #ffd27a; letter-spacing: 2px; margin-bottom: 14px; }
+.cut-bubble {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border: 3px solid #ff9ab5;
+  border-radius: 18px;
+  padding: 12px 20px;
+  max-width: 420px;
+}
+.cut-bubble img {
+  width: 74px; height: 74px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #ffd27a;
+}
+.cut-quote { color: #333; font-size: 16px; font-weight: bold; }
+.cut-tip { margin-top: 16px; font-size: 12px; color: #8a90b8; animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: 0.35; } }
+
+/* ---------------- 暂停 ---------------- */
+.pause-panel { text-align: center; background: #10132e; border: 1px solid #2a2f5e; border-radius: 12px; padding: 24px 40px; }
+.pause-panel h2 { color: #ffd27a; margin-bottom: 8px; }
+.pause-panel p { font-size: 12px; color: #9aa2d8; margin-bottom: 12px; }
+
+/* ---------------- 结算 ---------------- */
+.settle-panel {
+  text-align: center;
+  background: #10132e;
+  border: 1px solid #2a2f5e;
+  border-radius: 12px;
+  padding: 18px 30px;
+  max-width: 460px;
+}
+.settle-panel h2 { font-size: 24px; letter-spacing: 3px; margin-bottom: 10px; }
+.settle-imgbox {
+  width: 130px; height: 130px;
+  margin: 0 auto 10px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 3px solid #ffd27a;
+  background: #fff;
+}
+.settle-imgbox img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.settle-lines { font-size: 14px; line-height: 1.9; color: #cfd4ff; }
+.settle-lines b { color: #ffd27a; }
+.unlock-item {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #161b3f;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #dfe3ff;
+}
+.settle-btns { margin-top: 14px; display: flex; flex-direction: column; align-items: center; }
+
+/* ---------------- 页脚 ---------------- */
+#footer {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #5a5f8e;
+  letter-spacing: 1px;
+}
