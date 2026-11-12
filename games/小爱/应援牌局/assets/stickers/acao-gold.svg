@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="阿草金光">
+  <defs>
+    <radialGradient id="gold" cx="36%" cy="28%" r="82%">
+      <stop offset="0%" stop-color="#ffe9a8"/>
+      <stop offset="55%" stop-color="#e5b944"/>
+      <stop offset="100%" stop-color="#9c7115"/>
+    </radialGradient>
+  </defs>
+  <rect width="120" height="120" fill="#2b2413"/>
+  <g fill="#ffe9a8" opacity="0.9">
+    <path d="M18 20l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/>
+    <path d="M100 78l2.5 6.5 6.5 2.5-6.5 2.5-2.5 6.5-2.5-6.5-6.5-2.5 6.5-2.5z"/>
+  </g>
+  <circle cx="60" cy="66" r="40" fill="url(#gold)" stroke="#6f4f0c" stroke-width="3"/>
+  <path d="M60 30c-4-12 2-20 12-22-1 13-5 19-12 22z" fill="#f4d67f"/>
+  <path d="M60 30c4-12-2-20-12-22 1 13 5 19 12 22z" fill="#d3ac48"/>
+  <circle cx="46" cy="62" r="6" fill="#4a3208"/>
+  <circle cx="74" cy="62" r="6" fill="#4a3208"/>
+  <circle cx="48" cy="60" r="2" fill="#fff"/>
+  <circle cx="76" cy="60" r="2" fill="#fff"/>
+  <path d="M46 78q14 12 28 0" fill="none" stroke="#4a3208" stroke-width="4" stroke-linecap="round"/>
+</svg>

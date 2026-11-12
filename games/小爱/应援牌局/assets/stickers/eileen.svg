@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="乃琳">
+  <rect width="120" height="120" fill="#232a3c"/>
+  <circle cx="60" cy="64" r="36" fill="#e6ebf7"/>
+  <path d="M22 64q-2-38 38-38t38 38q-4-20-16-24 0 12-10 14-2-16-12-16t-12 16q-12-2-12-16-10 6-14 26z" fill="#576690"/>
+  <circle cx="48" cy="64" r="5" fill="#2a3047"/>
+  <circle cx="72" cy="64" r="5" fill="#2a3047"/>
+  <circle cx="50" cy="62" r="1.8" fill="#fff"/>
+  <circle cx="74" cy="62" r="1.8" fill="#fff"/>
+  <path d="M52 79q8 6 16 0" fill="none" stroke="#7a86ab" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="38" cy="76" r="4.5" fill="#c8d2ee" opacity="0.8"/>
+  <circle cx="82" cy="76" r="4.5" fill="#c8d2ee" opacity="0.8"/>
+  <circle cx="88" cy="40" r="4" fill="#dfe6ff"/>
+</svg>

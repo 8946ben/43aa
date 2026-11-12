@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="思诺">
+  <rect width="120" height="120" fill="#2a2340"/>
+  <circle cx="60" cy="64" r="36" fill="#ece6ff"/>
+  <path d="M22 66q0-40 38-40t38 40q-4-16-16-22-2 12-12 14 2-16-10-16t-12 16q-10-2-12-14-8 6-14 22z" fill="#7252c0"/>
+  <circle cx="48" cy="64" r="5" fill="#332a52"/>
+  <circle cx="72" cy="64" r="5" fill="#332a52"/>
+  <circle cx="50" cy="62" r="1.8" fill="#fff"/>
+  <circle cx="74" cy="62" r="1.8" fill="#fff"/>
+  <path d="M52 79q8 7 16 0" fill="none" stroke="#8f74d6" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M92 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#d8c8ff"/>
+  <circle cx="38" cy="76" r="4.5" fill="#d5c6ff" opacity="0.85"/>
+  <circle cx="82" cy="76" r="4.5" fill="#d5c6ff" opacity="0.85"/>
+</svg>

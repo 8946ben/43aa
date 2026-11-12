@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>一个魂 · 应援牌局</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="brand">一个魂 · 应援牌局</div>
+      <div class="hud">
+        <span id="colorBadge" class="color-badge">当前颜色：—</span>
+        <span id="turnInfo" class="turn-info"></span>
+        <button id="btnRecord" class="mini-btn">战绩</button>
+        <button id="btnRestart" class="mini-btn">重开</button>
+      </div>
+    </header>
+
+    <main id="board">
+      <section id="seatTop" class="seat seat-top"></section>
+      <section id="seatLeft" class="seat seat-left"></section>
+      <section id="seatRight" class="seat seat-right"></section>
+
+      <section id="center" class="center">
+        <div id="piles">
+          <div id="drawPile" class="pile draw-pile" title="点击摸 1 张牌">
+            <div class="card back"></div>
+            <span class="pile-label">摸牌堆 <b id="drawCount">0</b></span>
+          </div>
+          <div id="discardPile" class="pile discard-pile"></div>
+        </div>
+        <div id="controls">
+          <button id="btnDraw" class="ctrl-btn">摸牌</button>
+          <button id="btnPass" class="ctrl-btn" hidden>过牌</button>
+          <button id="btnUno" class="uno-btn" hidden>应援！</button>
+        </div>
+        <p id="status" class="status"></p>
+      </section>
+
+      <section id="handWrap" class="hand-wrap">
+        <div id="hand" class="hand"></div>
+        <div class="you-label">你 · <span id="handCount">0</span> 张</div>
+      </section>
+    </main>
+
+    <!-- 选色浮层（打出万能牌时） -->
+    <div id="colorOverlay" class="overlay" hidden>
+      <div class="overlay-card">
+        <h2>选择颜色</h2>
+        <p class="overlay-tip">万能牌：阿草帮你换色</p>
+        <div id="colorChoices" class="color-choices"></div>
+      </div>
+    </div>
+
+    <!-- 开始浮层 -->
+    <div id="startOverlay" class="overlay">
+      <div class="overlay-card start-card">
+        <h1>一个魂 · 应援牌局</h1>
+        <p class="subtitle">UNO 规则卡牌对战 · 玩家 vs 3 位成员 AI</p>
+        <div class="rules-brief">
+          <p>四色即成员色：红=贝拉 · 粉=嘉然 · 蓝=乃琳 · 紫=思诺；万能牌=阿草。</p>
+          <p>出牌须与当前颜色或数字 / 符号匹配；无牌可出则摸 1 张，摸到能出可立即出。</p>
+          <p>手牌只剩 1 张时，2 秒内按下「应援！」免罚，忘记罚摸 2 张；先出完者胜。</p>
+        </div>
+        <button id="btnStart" class="big-btn">开始牌局</button>
+        <div id="recordBrief" class="record-brief"></div>
+      </div>
+    </div>
+
+    <!-- 结束浮层 -->
+    <div id="endOverlay" class="overlay" hidden>
+      <div class="overlay-card">
+        <h2 id="endTitle"></h2>
+        <p id="endScore" class="end-score"></p>
+        <div id="endRecord" class="record-brief"></div>
+        <button id="btnAgain" class="big-btn">再来一局</button>
+      </div>
+    </div>
+
+    <!-- 战绩浮层 -->
+    <div id="recordOverlay" class="overlay" hidden>
+      <div class="overlay-card">
+        <h2>战绩</h2>
+        <div id="recordFull" class="record-brief"></div>
+        <button id="btnRecordClose" class="big-btn">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 经典 script 顺序加载：零构建、file:// 直接打开也能跑，避免 ES module 的 CORS 报错 -->
+  <script src="js/constants.js"></script>
+  <script src="js/deck.js"></script>
+  <script src="js/rules.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

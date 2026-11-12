@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="阿草">
+  <defs>
+    <radialGradient id="g" cx="38%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#9fe07a"/>
+      <stop offset="100%" stop-color="#3f8f33"/>
+    </radialGradient>
+  </defs>
+  <rect width="120" height="120" fill="#1d2a1a"/>
+  <circle cx="60" cy="66" r="40" fill="url(#g)" stroke="#20351c" stroke-width="3"/>
+  <path d="M60 30c-4-12 2-20 12-22-1 13-5 19-12 22z" fill="#7bd15a"/>
+  <path d="M60 30c4-12-2-20-12-22 1 13 5 19 12 22z" fill="#5cb045"/>
+  <circle cx="46" cy="62" r="6" fill="#20351c"/>
+  <circle cx="74" cy="62" r="6" fill="#20351c"/>
+  <circle cx="48" cy="60" r="2" fill="#fff"/>
+  <circle cx="76" cy="60" r="2" fill="#fff"/>
+  <path d="M48 80q12 10 24 0" fill="none" stroke="#20351c" stroke-width="4" stroke-linecap="round"/>
+</svg>

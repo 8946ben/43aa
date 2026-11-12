@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="贝拉">
+  <rect width="120" height="120" fill="#3b2624"/>
+  <circle cx="60" cy="64" r="36" fill="#ffe0d8"/>
+  <path d="M22 66q-2-40 38-40t38 40q-6-18-22-20 6 10-4 16-8-16-26-16-16 0-22 18-8-4-2-14-6 4 0 16z" fill="#db7d74"/>
+  <circle cx="48" cy="64" r="5" fill="#4a2622"/>
+  <circle cx="72" cy="64" r="5" fill="#4a2622"/>
+  <circle cx="50" cy="62" r="1.8" fill="#fff"/>
+  <circle cx="74" cy="62" r="1.8" fill="#fff"/>
+  <path d="M50 78q10 9 20 0" fill="none" stroke="#b45f57" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M84 34l10-4-6 10z" fill="#f4c14e"/>
+  <circle cx="38" cy="75" r="5" fill="#ffb3a8" opacity="0.8"/>
+  <circle cx="82" cy="75" r="5" fill="#ffb3a8" opacity="0.8"/>
+</svg>
