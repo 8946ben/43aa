@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0820">
+  <title>星火机忆 · Spark Engine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- 顶栏 HUD -->
+    <div id="topbar">
+      <div class="tb-brand">
+        <span class="tb-glyph">✦</span>
+        <span class="tb-title">星火机忆</span>
+        <span class="tb-en">SPARK ENGINE</span>
+      </div>
+
+      <div class="tb-stats">
+        <div class="stat">
+          <span class="stat-label">星尘</span>
+          <b id="hud-dust">0</b>
+        </div>
+        <div class="stat stat-fuel">
+          <span class="stat-label">燃料</span>
+          <b id="hud-fuel">0/30</b>
+          <div class="bar"><i id="fuel-bar"></i></div>
+        </div>
+        <div class="stat stat-hp">
+          <span class="stat-label">核心</span>
+          <b id="hud-hp">100</b>
+          <div class="bar hp"><i id="hp-bar"></i></div>
+          <div class="bar sh"><i id="shield-bar"></i></div>
+        </div>
+        <div class="stat">
+          <span class="stat-label">点亮</span>
+          <b id="hud-lit">0</b>
+        </div>
+        <div class="stat">
+          <span class="stat-label">得分</span>
+          <b id="hud-score">0</b>
+        </div>
+      </div>
+
+      <div class="tb-right">
+        <span id="hud-tip" class="tb-tip">准备</span>
+        <button id="btn-run" class="btn small ghost">暂停 (P)</button>
+        <button id="btn-mute" class="btn small ghost">音效：开 (M)</button>
+      </div>
+    </div>
+
+    <!-- 遗物条 -->
+    <div id="relic-bar">
+      <span class="rb-label">遗物</span>
+      <div id="relic-list"><span class="relic-empty">还没捡到遗物</span></div>
+      <span id="hud-hint" class="rb-hint"></span>
+      <span id="hud-wave" class="rb-wave">准备</span>
+    </div>
+
+    <!-- 舞台 -->
+    <div id="stage-wrap">
+      <canvas id="game" width="960" height="640"></canvas>
+
+      <!-- 波次横幅 -->
+      <div id="banner" class="banner hidden">
+        <div id="banner-title"></div>
+        <div id="banner-sub"></div>
+      </div>
+
+      <!-- 主菜单 -->
+      <div id="ov-menu" class="overlay">
+        <div class="menu">
+          <div class="menu-head">
+            <div class="menu-eyebrow">A-SOUL 同人 · 二次元星图策略</div>
+            <h1>星火机忆</h1>
+            <div class="menu-en">SPARK ENGINE</div>
+            <p class="menu-pitch">
+              你只有<b>一颗会走的火种</b>。<br>
+              点亮一个节点，就连一条线；连线接回核心，星图才开始呼吸。<br>
+              供给、火力、护盾——每一颗灯都要取舍。
+            </p>
+          </div>
+
+          <div class="menu-constel">
+            <div class="mc-title">选择一张星图</div>
+            <div id="constel-grid" class="constel-grid"></div>
+          </div>
+
+          <div class="menu-foot">
+            <div class="menu-rules">
+              <span><i class="k">点节点</i>点亮相邻节点（花星尘）</span>
+              <span><i class="k">链路</i>接通的节点才工作</span>
+              <span><i class="k">啃食者</i>会来啃你的灯</span>
+              <span><i class="k">撑过 3 波</i>散尽即胜</span>
+            </div>
+            <div class="menu-actions">
+              <button id="btn-help" class="btn ghost">玩法说明</button>
+              <span id="menu-best" class="menu-best">还没有纪录</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 玩法说明 -->
+      <div id="ov-help" class="overlay hidden">
+        <div class="panel help-panel">
+          <h2>怎么玩</h2>
+          <ol class="help-list">
+            <li><b>火种落在你点亮的第一个节点上。</b>站在一个节点上时，只能点亮与它<b>吸附相连</b>（虚线亮起）的节点。</li>
+            <li><b>链路 = 从核心出发、只经过已点亮节点能走通。</b>没链路的灯是孤岛：不产星尘、不开火。</li>
+            <li><b>星尘</b>是唯一的货币——点亮节点要用它。只有接通的<b>星尘源</b>能持续产星尘。</li>
+            <li><b>燃料</b>每回合消耗 1 点维持星图。只有接通的<b>生产器</b>会补充燃料；燃料见底，全场变暗停产。</li>
+            <li><b>火力</b>和<b>护盾</b>也必须接通才生效：塔自动索敌，护盾节点给你的核心加盾并缓慢修复。</li>
+            <li><b>机群</b>从核心外围的虚线环飞进来。飘虫与侵蚀体直扑核心；<b>啃食者</b>会先啃掉离核心最近的节点。</li>
+            <li>点亮节点偶尔会掉落<b>遗物</b>（折射棱镜 / 超频齿轮 / 丰饶之种……），即时生效，滚雪球。</li>
+            <li>撑过三波、核心不破，就算活下来。核心血量决定你在结算时拿几颗星。</li>
+          </ol>
+          <p class="help-tip">
+            快捷键：<b>P / Esc</b> 暂停 · <b>M</b> 静音 · <b>R</b> 重开本局。<br>
+            手机：直接点节点即可，画布自动等比缩放。
+          </p>
+          <button id="btn-help-back" class="btn">开始吧</button>
+        </div>
+      </div>
+
+      <!-- 暂停 -->
+      <div id="ov-pause" class="overlay hidden">
+        <div class="panel">
+          <h2>暂停中</h2>
+          <p class="panel-sub">星图还亮着。（P / Esc 继续）</p>
+          <div class="row">
+            <button id="btn-resume-run" class="btn">继续 (P)</button>
+            <button id="btn-resume-restart" class="btn ghost">重开本局</button>
+            <button id="btn-resume-menu" class="btn ghost">返回星图选择</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 结算 -->
+      <div id="ov-result" class="overlay hidden">
+        <div class="panel result">
+          <h2 id="res-title">星图守住了</h2>
+          <div id="res-stars" class="res-stars"></div>
+          <p id="res-sub" class="panel-sub"></p>
+          <div id="res-stats" class="res-stats"></div>
+          <div class="row">
+            <button id="btn-again" class="btn">再点一次灯</button>
+            <button id="btn-to-menu" class="btn ghost">换张星图</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-foot">
+      A-SOUL 同人非商用作品 · 星图 / 节点 / 机群全部 canvas 矢量绘制 · 音效 WebAudio 实时合成<br>
+      角色形象版权归 A-SOUL 制作委员会所有，素材来自本地素材库，仅供学习交流。
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
