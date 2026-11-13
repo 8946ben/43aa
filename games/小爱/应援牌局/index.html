@@ -15,8 +15,15 @@
         <span id="turnInfo" class="turn-info"></span>
         <button id="btnRecord" class="mini-btn">战绩</button>
         <button id="btnRestart" class="mini-btn">重开</button>
+        <button id="btnMute" class="mini-btn icon-btn" title="音效开关" aria-label="音效开关">🔊</button>
       </div>
     </header>
+
+    <!-- 锦标赛积分榜 / 记牌器 -->
+    <div id="subbar" class="subbar" hidden>
+      <div id="scoreBoard" class="score-board"></div>
+      <div id="counter" class="counter" hidden></div>
+    </div>
 
     <main id="board">
       <section id="seatTop" class="seat seat-top"></section>
@@ -24,6 +31,7 @@
       <section id="seatRight" class="seat seat-right"></section>
 
       <section id="center" class="center">
+        <div id="pendingBadge" class="pending-badge" hidden>罚牌 x0</div>
         <div id="piles">
           <div id="drawPile" class="pile draw-pile" title="点击摸 1 张牌">
             <div class="card back"></div>
@@ -34,6 +42,7 @@
         <div id="controls">
           <button id="btnDraw" class="ctrl-btn">摸牌</button>
           <button id="btnPass" class="ctrl-btn" hidden>过牌</button>
+          <button id="btnAccept" class="ctrl-btn accept-btn" hidden>认罚</button>
           <button id="btnUno" class="uno-btn" hidden>应援！</button>
         </div>
         <p id="status" class="status"></p>
@@ -59,21 +68,45 @@
       <div class="overlay-card start-card">
         <h1>一个魂 · 应援牌局</h1>
         <p class="subtitle">UNO 规则卡牌对战 · 玩家 vs 3 位成员 AI</p>
+
+        <div class="setup">
+          <div class="setup-row">
+            <span class="setup-label">模式</span>
+            <div class="seg" id="modeSeg">
+              <button type="button" data-mode="single">快速单局</button>
+              <button type="button" data-mode="tournament" class="on">锦标赛</button>
+            </div>
+          </div>
+          <div class="setup-row" id="roundsRow">
+            <span class="setup-label">赛制</span>
+            <div class="seg" id="roundsSeg">
+              <button type="button" data-rounds="3" class="on">3 局两胜</button>
+              <button type="button" data-rounds="5">5 局三胜</button>
+            </div>
+          </div>
+          <div class="setup-row setup-toggles">
+            <label class="switch"><input type="checkbox" id="optStack"><i class="knob"></i><span>+2/+4 叠加</span></label>
+            <label class="switch"><input type="checkbox" id="optCounter"><i class="knob"></i><span>记牌器</span></label>
+          </div>
+        </div>
+
         <div class="rules-brief">
           <p>四色即成员色：红=贝拉 · 粉=嘉然 · 蓝=乃琳 · 紫=思诺；万能牌=阿草。</p>
           <p>出牌须与当前颜色或数字 / 符号匹配；无牌可出则摸 1 张，摸到能出可立即出。</p>
           <p>手牌只剩 1 张时，2 秒内按下「应援！」免罚，忘记罚摸 2 张；先出完者胜。</p>
+          <p>锦标赛：每局胜者累计「三家手牌点数和」，先到 2 胜（5 局则 3 胜）或打满局数，总积分最高者夺冠。</p>
         </div>
         <button id="btnStart" class="big-btn">开始牌局</button>
         <div id="recordBrief" class="record-brief"></div>
       </div>
     </div>
 
-    <!-- 结束浮层 -->
+    <!-- 结束浮层（单局结算 / 局间结算 / 冠军结算） -->
     <div id="endOverlay" class="overlay" hidden>
       <div class="overlay-card">
         <h2 id="endTitle"></h2>
         <p id="endScore" class="end-score"></p>
+        <div id="endRank" class="rank-wrap"></div>
         <div id="endRecord" class="record-brief"></div>
         <button id="btnAgain" class="big-btn">再来一局</button>
       </div>
@@ -89,11 +122,17 @@
     </div>
   </div>
 
+  <!-- 飞牌动画层 / 语录 toast / 应援屏幕边缘提示 -->
+  <div id="fxLayer" aria-hidden="true"></div>
+  <div id="toastLayer" aria-live="polite"></div>
+  <div id="unoEdge" aria-hidden="true"></div>
+
   <!-- 经典 script 顺序加载：零构建、file:// 直接打开也能跑，避免 ES module 的 CORS 报错 -->
   <script src="js/constants.js"></script>
   <script src="js/deck.js"></script>
   <script src="js/rules.js"></script>
   <script src="js/ai.js"></script>
+  <script src="js/audio.js"></script>
   <script src="js/game.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/main.js"></script>
