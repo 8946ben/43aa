@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>Rush LJ · 弹弓物理原型</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #0d1016;
+    font-family: "SF Pro Text", "PingFang SC", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #eef1f6;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  body { display: flex; align-items: center; justify-content: center; }
+
+  .stage {
+    position: relative;
+    width: min(100vw, 177.78vh);
+    line-height: 0;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  }
+  canvas { display: block; width: 100%; height: auto; touch-action: none; }
+
+  .hud {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    line-height: normal;
+    font-size: 14px;
+  }
+  .hud-row {
+    position: absolute;
+    top: 18px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .hud-row.left { left: 18px; }
+  .hud-row.right { right: 18px; }
+
+  .chip {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(10, 14, 22, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(6px);
+  }
+  .chip .k { font-size: 12px; color: #9aa6ba; letter-spacing: 0.06em; }
+  .chip .v { font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .chip .v.bird { color: #ff8a7a; }
+  .chip .v.pig { color: #96e07a; }
+  .chip .v.score { color: #ffd479; }
+
+  .btn {
+    pointer-events: auto;
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(10, 14, 22, 0.6);
+    color: #eef1f6;
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+  .btn:hover { background: rgba(255, 255, 255, 0.16); }
+
+  .banner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(6, 9, 14, 0.55);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.22s ease;
+    pointer-events: none;
+  }
+  .banner.show { opacity: 1; visibility: visible; }
+  .banner-title { font-size: 46px; font-weight: 700; letter-spacing: 0.04em; }
+  .banner[data-kind="win"] .banner-title { color: #6ff0a4; }
+  .banner[data-kind="lose"] .banner-title { color: #ff8a7a; }
+  .banner-sub { font-size: 15px; color: #b7c1d1; }
+  .banner .btn {
+    position: static;
+    margin-top: 10px;
+    display: none;
+    padding: 12px 34px;
+    font-weight: 600;
+  }
+  .banner .btn.show { display: inline-block; }
+
+  .btn-left { left: 18px; right: auto; }
+
+  /* ---------------- 主菜单 / 图鉴 ---------------- */
+
+  .menu {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 9, 14, 0.62);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.22s ease;
+    pointer-events: none;
+  }
+  .menu.show { opacity: 1; visibility: visible; pointer-events: auto; }
+  .menu-card {
+    text-align: center;
+    padding: 30px 46px 34px;
+    border-radius: 22px;
+    background: rgba(10, 14, 22, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(8px);
+    max-width: 560px;
+  }
+  .menu-card h1 { margin: 0 0 2px; font-size: 46px; letter-spacing: 0.06em; }
+  .menu-card h2 { margin: 0 0 4px; font-size: 28px; letter-spacing: 0.06em; }
+  .menu-sub { margin: 0 0 22px; font-size: 13px; color: #9aa6ba; letter-spacing: 0.22em; }
+  .menu-btn {
+    padding: 12px 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.10);
+    color: #eef1f6;
+    font: inherit;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+  .menu-btn:hover { background: rgba(255, 255, 255, 0.2); }
+  .menu-btn.primary { background: #3f9d5f; font-size: 18px; padding: 13px 46px; }
+  .menu-btn.primary:hover { background: #4bb26e; }
+  .menu-levels { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+  .lv-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 92px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.07);
+    color: #9aa6ba;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+  .lv-btn b { font-size: 16px; color: #eef1f6; }
+  .lv-btn:hover { background: rgba(255, 255, 255, 0.16); }
+  .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 18px 0 22px; }
+  .char-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 12px 12px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+  }
+  .char-card.enemy { border-color: rgba(255, 138, 122, 0.35); }
+  .char-card canvas { width: 88px; height: 88px; }
+  .char-name { font-weight: 600; font-size: 15px; }
+  .char-desc { font-size: 12px; color: #9aa6ba; line-height: 1.55; }
+  .menu-row { display: flex; gap: 12px; justify-content: center; }
+
+  /* ---------------- 关卡编辑器 ---------------- */
+
+  .editing .hud { display: none; }
+  .editor {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 176px;
+    pointer-events: auto;
+    line-height: normal;
+  }
+  .editor[hidden] { display: none; }
+  .ed-card {
+    padding: 14px 14px 12px;
+    border-radius: 16px;
+    background: rgba(10, 14, 22, 0.84);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(8px);
+  }
+  .ed-card h3 { margin: 0 0 10px; font-size: 15px; letter-spacing: 0.1em; text-align: center; }
+  .ed-tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+  .ed-tool {
+    padding: 8px 2px;
+    border-radius: 9px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.07);
+    color: #eef1f6;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .ed-tool:hover { background: rgba(255, 255, 255, 0.16); }
+  .ed-tool.active { background: #3f9d5f; border-color: #4bb26e; }
+  .ed-tool[data-tool="erase"].active { background: #c0564a; border-color: #d16a5e; }
+  .ed-stats { text-align: center; font-size: 11px; color: #9aa6ba; margin-bottom: 8px; }
+  .ed-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .ed-row button {
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.08);
+    color: #eef1f6;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .ed-row button:hover { background: rgba(255, 255, 255, 0.18); }
+  .ed-row b { min-width: 20px; text-align: center; font-size: 15px; }
+  .ed-label { color: #9aa6ba; font-size: 12px; }
+  .ed-back {
+    width: 100%;
+    padding: 8px 0;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.08);
+    color: #eef1f6;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .ed-back:hover { background: rgba(255, 255, 255, 0.18); }
+  .ed-tip { margin-top: 8px; font-size: 11px; color: #8b97a9; text-align: center; line-height: 1.6; }
+  .ed-toast {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 20px;
+    border-radius: 999px;
+    background: rgba(10, 14, 22, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    line-height: normal;
+  }
+  .ed-toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <canvas id="game"></canvas>
+    <div class="hud">
+      <div class="hud-row left">
+        <div class="chip"><span class="k">关卡</span><span class="v" id="hud-level">1/5</span></div>
+        <div class="chip"><span class="k">队伍</span><span class="v bird" id="hud-birds">3</span></div>
+        <div class="chip"><span class="k">牛</span><span class="v pig" id="hud-pigs">3</span></div>
+      </div>
+      <div class="hud-row right">
+        <div class="chip"><span class="k">分数</span><span class="v score" id="hud-score">0</span></div>
+      </div>
+      <button class="btn" id="btn-restart">重开本关</button>
+      <button class="btn btn-left" id="btn-menu">主菜单</button>
+      <div class="banner" id="banner">
+        <div class="banner-title"></div>
+        <div class="banner-sub"></div>
+        <button class="btn" id="btn-next">下一关</button>
+        <button class="btn" id="btn-retry">重开本关</button>
+      </div>
+      <div class="menu" id="menu">
+        <div class="menu-card" id="menu-home">
+          <h1>Rush LJ</h1>
+          <p class="menu-sub">弹弓物理小游戏</p>
+          <button class="menu-btn primary" id="btn-start">开始游戏</button>
+          <div class="menu-levels" id="menu-levels"></div>
+          <div class="menu-row">
+            <button class="menu-btn" id="btn-editor">关卡编辑</button>
+            <button class="menu-btn" id="btn-gallery">角色图鉴</button>
+          </div>
+        </div>
+        <div class="menu-card" id="menu-gallery" hidden>
+          <h2>角色图鉴</h2>
+          <div class="gallery-grid">
+            <div class="char-card">
+              <canvas id="portrait-bella" width="176" height="176"></canvas>
+              <div class="char-name">贝拉 · 我方</div>
+              <div class="char-desc">队伍的核心。紫粉色毛绒团子，头顶一枚粉水晶蝴蝶结。技能：点按掷出爆裂锤，砸到就炸。</div>
+            </div>
+            <div class="char-card">
+              <canvas id="portrait-jiaran" width="176" height="176"></canvas>
+              <div class="char-name">嘉然 · 我方</div>
+              <div class="char-desc">元气担当。暖棕团子顶着一撮呆毛，双蓝蝴蝶结。技能：点按一分为三，横向散开扫射。</div>
+            </div>
+            <div class="char-card">
+              <canvas id="portrait-nailin" width="176" height="176"></canvas>
+              <div class="char-name">乃琳 · 我方</div>
+              <div class="char-desc">优雅狙击手。银白团子配斜刘海与黑蝴蝶头饰。技能：点按直线瞬间加速，像一根飞矛扎穿全场。</div>
+            </div>
+            <div class="char-card enemy">
+              <canvas id="portrait-niuniu" width="176" height="176"></canvas>
+              <div class="char-name">牛牛 · 敌方</div>
+              <div class="char-desc">堡垒守卫。顶着米黄小角的白色牛牛，粉色大口鼻，怎么撞都不肯让步。</div>
+            </div>
+          </div>
+          <button class="menu-btn" id="btn-gallery-back">返回</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor" id="editor" hidden>
+      <div class="ed-card">
+        <h3>关卡编辑</h3>
+        <div class="ed-tools">
+          <button class="ed-tool" data-tool="pig">牛牛</button>
+          <button class="ed-tool" data-tool="wood-col">木柱</button>
+          <button class="ed-tool" data-tool="wood-beam">木梁</button>
+          <button class="ed-tool" data-tool="stone-col">石柱</button>
+          <button class="ed-tool" data-tool="stone-beam">石梁</button>
+          <button class="ed-tool" data-tool="erase">橡皮</button>
+        </div>
+        <div class="ed-stats" id="ed-stats"></div>
+        <div class="ed-row">
+          <span class="ed-label">弹量</span>
+          <button id="ed-birds-minus">−</button>
+          <b id="ed-birds">4</b>
+          <button id="ed-birds-plus">＋</button>
+        </div>
+        <div class="ed-row">
+          <button id="ed-test">▶ 测试</button>
+          <button id="ed-save">保存</button>
+        </div>
+        <div class="ed-row">
+          <button id="ed-load">读取</button>
+          <button id="ed-clear">清空</button>
+        </div>
+        <button class="ed-back" id="ed-back">返回菜单</button>
+        <div class="ed-tip">左键放置 · 右键删除<br>网格自动吸附</div>
+      </div>
+    </div>
+    <div class="ed-toast" id="ed-toast"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+  <script src="js/level.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/slingshot.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

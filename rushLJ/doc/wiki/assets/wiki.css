@@ -1,0 +1,146 @@
+/* Rush LJ 项目图wiki —— 全站统一样式（深色，呼应游戏画面） */
+
+:root {
+  --bg: #0d1016;
+  --panel: rgba(10, 14, 22, 0.82);
+  --border: rgba(255, 255, 255, 0.14);
+  --text: #eef1f6;
+  --muted: #9aa6ba;
+  --accent: #ff8a7a;
+  --green: #6ff0a4;
+  --gold: #ffd479;
+  --link: #7fc4ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "SF Pro Text", "PingFang SC", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.65;
+}
+
+/* 顶部导航 */
+nav.top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: center;
+  padding: 12px 22px;
+  background: rgba(10, 14, 22, 0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  font-size: 13px;
+}
+nav.top .brand {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-right: 10px;
+  color: var(--gold);
+}
+nav.top a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+nav.top a:hover { color: var(--text); border-color: var(--border); }
+nav.top a.here { color: var(--text); border-color: var(--border); background: rgba(255,255,255,0.07); }
+nav.top .updated { margin-left: auto; color: var(--muted); font-size: 12px; }
+
+main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 26px 22px 80px;
+}
+
+header.page h1 {
+  margin: 6px 0 4px;
+  font-size: 30px;
+  letter-spacing: 0.05em;
+}
+header.page p.lead {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* 图容器：图是页面主体 */
+figure.diagram {
+  margin: 22px 0;
+  padding: 20px 16px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow-x: auto;
+}
+figure.diagram figcaption {
+  margin-top: 8px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+figure.diagram .mermaid {
+  display: flex;
+  justify-content: center;
+}
+figure.diagram .mermaid svg { max-width: 100%; height: auto; }
+
+/* 文字注解 */
+section.notes {
+  margin-top: 18px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+section.notes .note {
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 14px;
+  font-size: 13.5px;
+}
+section.notes .note h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+}
+section.notes .note code, p code, td code {
+  background: rgba(255, 255, 255, 0.10);
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 12.5px;
+}
+
+/* 表格注解 */
+table.spec {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0 6px;
+  font-size: 13.5px;
+}
+table.spec th, table.spec td {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 7px 12px;
+  text-align: left;
+}
+table.spec th { background: rgba(255, 255, 255, 0.06); color: var(--muted); font-weight: 500; }
+table.spec td.num { font-variant-numeric: tabular-nums; }
+
+a { color: var(--link); }
+
+footer.page {
+  margin-top: 34px;
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 14px;
+}

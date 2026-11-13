@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>关卡数据 · Rush LJ wiki</title>
+<link rel="stylesheet" href="assets/wiki.css" />
+</head>
+<body>
+<nav class="top">
+  <span class="brand">Rush LJ wiki</span>
+  <a href="index.html">架构总览</a>
+  <a href="modules.html">模块与加载</a>
+  <a href="main-loop.html">主循环与回合</a>
+  <a href="combat.html">伤害与技能</a>
+  <a href="entities.html">实体与参数</a>
+  <a href="rendering.html">渲染管线</a>
+  <a class="here" href="levels.html">关卡数据</a>
+  <span class="updated">最后更新：2026-10-02</span>
+</nav>
+
+<main>
+  <header class="page">
+    <h1>关卡数据与扩展指南</h1>
+    <p class="lead">level.js 是纯数据文件：<code>LEVELS</code> 数组的每个对象就是一关，新增关卡只追加数据、不改任何逻辑代码。坐标系为逻辑画布 1280×720，地面顶点 y=660。</p>
+  </header>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart TB
+  LV["LEVELS[i] 单关对象"]
+  NAME["name 关卡名<br/>（选关按钮 / HUD 不显示）"]
+  BIRDS["birds 弹数<br/>决定这一关的队伍规模"]
+  SLING["slingshot {x, y}<br/>弹弓锚点（8 关全是 200,470）"]
+  BLOCKS["blocks[] 方块<br/>{x, y, w, h, material}<br/>x/y 为矩形中心<br/>material ∈ wood | stone"]
+  PIGS["pigs[] 牛牛<br/>{x, y} 为圆心"]
+  RULE["叠放规则：方块中心 y = 支撑面顶部 − h/2<br/>地面支撑面为 660"]
+
+  LV --> NAME
+  LV --> BIRDS
+  LV --> SLING
+  LV --> BLOCKS
+  LV --> PIGS
+  RULE -.布点时手工保证.-> BLOCKS
+    </pre>
+    <figcaption>图 1 · 关卡数据模型：一个对象描述一关的全部内容，startLevel 直接按它批量造实体</figcaption>
+  </figure>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart LR
+  ADD["往 LEVELS 追加一个对象"]
+  MENU["主菜单自动多一个选关按钮<br/>LEVELS.forEach 生成"]
+  HASH["深链自动可用<br/>index.html#9 直达第 9 关"]
+  HUD["HUD 关卡计数自动更新<br/>(levelIndex+1)/LEVELS.length"]
+  NEXT["过关横幅『下一关』自动衔接<br/>取模循环到第 1 关"]
+
+  ADD --> MENU
+  ADD --> HASH
+  ADD --> HUD
+  ADD --> NEXT
+    </pre>
+    <figcaption>图 2 · 新增关卡零代码改动：UI、深链、HUD 全部由 LEVELS.length 驱动</figcaption>
+  </figure>
+
+  <section class="notes">
+    <div class="note">
+      <h3>当前 8 关概览</h3>
+      <table class="spec">
+        <tr><th>#</th><th>关名</th><th>弹数</th><th>方块构成</th><th>牛数</th><th>设计主题</th></tr>
+        <tr><td class="num">1</td><td>木头哨塔</td><td class="num">3</td><td>石柱×2 + 木梁木屋</td><td class="num">3</td><td>直击屋顶 + 压低平射</td></tr>
+        <tr><td class="num">2</td><td>石墙卫站</td><td class="num">3</td><td>双层石墙 + 石塔木屋</td><td class="num">3</td><td>高抛越墙 or 砸塌</td></tr>
+        <tr><td class="num">3</td><td>双子木桥</td><td class="num">3</td><td>全木桥塔 ×2</td><td class="num">3</td><td>塌桥压桥下牛</td></tr>
+        <tr><td class="num">4</td><td>石板地窖</td><td class="num">3</td><td>石柱×2 + 石板</td><td class="num">3</td><td>板下双牛只能靠塌</td></tr>
+        <tr><td class="num">5</td><td>牛牛堡垒</td><td class="num">4</td><td>护墙 + 双层木塔 + 石堡</td><td class="num">4</td><td>多点位混编</td></tr>
+        <tr><td class="num">6</td><td>三连石屋</td><td class="num">4</td><td>石屋×2 + 木阁</td><td class="num">4</td><td>打断柱即塌屋</td></tr>
+        <tr><td class="num">7</td><td>高塔警哨</td><td class="num">4</td><td>细高木塔 + 石基堡垒</td><td class="num">4</td><td>高位哨点需精确直击</td></tr>
+        <tr><td class="num">8</td><td>牛牛竞技场</td><td class="num">5</td><td>双石墙 + 三层木堡 + 石窖</td><td class="num">5</td><td>终关：中缝穿弹 + 塌三层</td></tr>
+      </table>
+    </div>
+    <div class="note">
+      <h3>布点验收清单</h3>
+      <p>① 叠放方块必须满足中心 y 公式，否则开局即塌；② 牛不要埋进方块内部（物理解算会弹开）；③ 建议每关留 1 只「露天可直击」的牛，避免死局；④ 弹数建议 ≈ 牛数 + 1。</p>
+    </div>
+    <div class="note">
+      <h3>material 选型经验</h3>
+      <p>石头 hp 88、密度 0.0055，适合做「不可速拆的承重柱」，逼玩家打结构；木头 hp 45，适合做屋面与横梁，直击可拆。同一关两者混编能产生「先拆木、再塌石」的节奏。</p>
+    </div>
+  </section>
+
+  <footer class="page">
+    返回 <a href="index.html">架构总览</a> · 相关页：<a href="entities.html">实体与参数</a> · Rush LJ 项目图wiki
+  </footer>
+</main>
+
+<script src="assets/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose', flowchart: { curve: 'basis', htmlLabels: true } });
+</script>
+</body>
+</html>

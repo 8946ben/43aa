@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>主循环与回合 · Rush LJ wiki</title>
+<link rel="stylesheet" href="assets/wiki.css" />
+</head>
+<body>
+<nav class="top">
+  <span class="brand">Rush LJ wiki</span>
+  <a href="index.html">架构总览</a>
+  <a href="modules.html">模块与加载</a>
+  <a class="here" href="main-loop.html">主循环与回合</a>
+  <a href="combat.html">伤害与技能</a>
+  <a href="entities.html">实体与参数</a>
+  <a href="rendering.html">渲染管线</a>
+  <a href="levels.html">关卡数据</a>
+  <span class="updated">最后更新：2026-10-02</span>
+</nav>
+
+<main>
+  <header class="page">
+    <h1>主循环与回合推进</h1>
+    <p class="lead">main.js 用「固定步长累加器 + 渲染解耦」的经典模式驱动游戏；回合以 <code>game.state</code> 四态状态机推进，<code>tickSettle</code> 判定停稳后换下一个角色。</p>
+  </header>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+stateDiagram-v2
+  [*] --> aiming: loadBird() 皮兜放入角色
+  aiming --> flying: launch(velocity)<br/>此时才创建刚体，birdsLeft--
+  flying --> settling: 停稳 26 帧 / 超时 6500ms / 飞出边界
+  flying --> over: 直接判定（罕见）
+  settling --> aiming: settleAt 后 nextBird() 还有弹
+  settling --> over: nextBird() 判定胜负
+  over --> [*]
+  over --> aiming: 重开 / 下一关 startLevel()
+  note right of flying
+    飞行中点按画布可触发一次技能
+    skillUsed 保证每发限一次
+  end note
+    </pre>
+    <figcaption>图 1 · 回合状态机：game.state ∈ { aiming, flying, settling, over }</figcaption>
+  </figure>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart TB
+  RAF["requestAnimationFrame(frame)<br/>delta 上限 100ms"]
+  ACC["accumulator += delta"]
+  LOOP{"accumulator ≥ STEP<br/>(1000/60)？guard &lt; 5"}
+  UP["update(now) —— 固定步长"]
+  P1["Engine.update(engine, STEP)<br/>物理积分（重力 g=1，pos 8 / vel 6 次迭代）"]
+  P2["applyCrush() 碾压伤害"]
+  P3["sweepDead() 尸体回收计分"]
+  P4["updateEgg() / updateClones() 回收"]
+  P5["decayFlashes() 受击白光衰减"]
+  P6["checkOutcome() 全灭即 win"]
+  P7["tickSettle(now) 推进回合状态机"]
+  DRAW["Render.draw(ctx, game) 每帧一次"]
+
+  RAF --> ACC --> LOOP
+  LOOP -->|是| UP --> P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> LOOP
+  LOOP -->|否| DRAW --> RAF
+    </pre>
+    <figcaption>图 2 · 帧循环：物理与结算按固定步长追赶（单帧最多补 5 步），渲染每帧只画一次</figcaption>
+  </figure>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant Sl as Slingshot（输入）
+  participant Main as main.js
+  participant Ent as Entities
+  participant Eng as Matter 引擎
+
+  Main->>Main: loadBird() 设 previewBird（不入世界）
+  Sl->>Main: 松手 onUp() → launch(pull × power)
+  Main->>Ent: createBird(x, y, skin)
+  Ent-->>Main: body（gameType='bird'）
+  Main->>Eng: Composite.add + setVelocity
+  Main->>Main: state='flying'，birdsLeft--
+  Eng->>Main: 每步 collisionStart（伤害结算，见 combat 页）
+  Main->>Main: tickSettle 停稳判定 → settling → 650ms
+  Main->>Main: nextBird()：清弹壳与分身
+  alt pigs 清空
+    Main->>Main: finish('win') + birdsLeft×10000 加分
+  else birdsLeft ≤ 0
+    Main->>Main: finish('lose')
+  else 还有弹
+    Main->>Main: loadBird() 轮换下一位角色
+  end
+    </pre>
+    <figcaption>图 3 · 单回合完整时序：从皮兜瞄准到下一轮出场</figcaption>
+  </figure>
+
+  <section class="notes">
+    <div class="note">
+      <h3>角色出场轮换</h3>
+      <p><code>currentSkin()</code> 按「已消耗弹数」对 <code>Entities.BIRD_SKINS</code> 取模轮换：贝拉 → 嘉然 → 乃琳 → 循环。分身（嘉然技能）不占回合数。</p>
+    </div>
+    <div class="note">
+      <h3>停稳判定的三个出口</h3>
+      <p>飞行结束任一满足：速度 &lt; 0.9 连续 26 帧；发射超 6500ms；飞出边界（x&lt;-160 / x&gt;W+200 / y&gt;H+400）。之后固定等 650ms 再换弹，给坍塌留时间。</p>
+    </div>
+    <div class="note">
+      <h3>计分规则</h3>
+      <p>消灭牛 +5000 / 拆方块 +500 / 过关剩余弹数每发 +10000。分数只增不减，HUD 实时同步 <code>syncHud()</code>。</p>
+    </div>
+  </section>
+
+  <footer class="page">
+    返回 <a href="index.html">架构总览</a> · 相关页：<a href="combat.html">伤害与技能</a> · Rush LJ 项目图wiki
+  </footer>
+</main>
+
+<script src="assets/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose', flowchart: { curve: 'basis', htmlLabels: true } });
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>渲染管线 · Rush LJ wiki</title>
+<link rel="stylesheet" href="assets/wiki.css" />
+</head>
+<body>
+<nav class="top">
+  <span class="brand">Rush LJ wiki</span>
+  <a href="index.html">架构总览</a>
+  <a href="modules.html">模块与加载</a>
+  <a href="main-loop.html">主循环与回合</a>
+  <a href="combat.html">伤害与技能</a>
+  <a href="entities.html">实体与参数</a>
+  <a class="here" href="rendering.html">渲染管线</a>
+  <a href="levels.html">关卡数据</a>
+  <span class="updated">最后更新：2026-10-02</span>
+</nav>
+
+<main>
+  <header class="page">
+    <h1>渲染管线</h1>
+    <p class="lead">Render 完全接管画面：不使用 Matter 自带渲染器，每帧在 1280×720 逻辑坐标上重绘全部内容，DPR 缩放由 main.js 的 <code>resizeCanvas</code> 统一处理。角色外观优先用 assets/ 精灵贴图，矢量手绘只是加载失败的回退。</p>
+  </header>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart TB
+  CLR["clearRect 清屏"]
+  SKY["drawSky 渐变天空 + 云 + 山丘"]
+  GND["drawGround 地面"]
+  TRJ["drawTrajectory 预测虚线（瞄准时）"]
+  SB["drawSlingBack 弹弓后叉 + 皮筋后股"]
+  BLK["逐个 drawBlock（木纹/裂纹按 hp）"]
+  PG["逐个 drawPig（贴图优先，hitFlash 白染）"]
+  EGGD["drawEgg（若存在 game.egg）"]
+  BB["drawBirdBody 飞行中角色"]
+  BP["drawBirdPreview 皮兜里的预览角色"]
+  SF["drawSlingFront 弹弓前叉 + 皮筋前股"]
+  HINT["drawHint 操作提示（首次瞄准）"]
+  OVER["drawHint 之后一帧结束，等待下次 RAF"]
+
+  CLR --> SKY --> GND --> TRJ --> SB --> BLK --> PG --> EGGD --> BB --> BP --> SF --> HINT --> OVER
+    </pre>
+    <figcaption>图 1 · Render.draw(ctx, game) 每帧的绘制顺序：从背景到前景，弹弓前叉永远盖在角色之上</figcaption>
+  </figure>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+stateDiagram-v2
+  [*] --> 加载中: 页面脚本执行时即 new Image() × 4<br/>bella / jiaran / nailin / niuniu
+  加载中 --> 就绪: onload 或 onerror（成败都算 settled）
+  就绪 --> 就绪: ready(fn) 立即执行回调
+  加载中 --> 就绪: 全部 settled 后触发 readyCbs
+  note right of 就绪
+    drawSpriteCentered 返回 false 时
+    调用方回退到矢量手绘
+    （drawBella / drawJiaran / drawNailin / drawPigVector）
+  end note
+    </pre>
+    <figcaption>图 2 · 精灵加载状态：成败都计入 settled，主菜单图鉴靠 Render.ready 在贴图完成后重绘</figcaption>
+  </figure>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart LR
+  SRC["assets/*.png 原图"]
+  TINT["tintWhite(key)<br/>离屏 canvas 白染<br/>source-atop 填充白色"]
+  CACHE["flashTints 缓存<br/>每个 key 只生成一次"]
+  DS["drawSpriteCentered(ctx, key, targetD, flash)"]
+  SCALE["按素材 max(w,h) 归一化缩放<br/>角色直径 52 / 牛牛 44"]
+  FLASH{"flash &gt; 0？"}
+  MIX["叠白染版<br/>globalAlpha = flash × 0.65"]
+
+  SRC --> TINT --> CACHE --> DS
+  DS --> SCALE --> FLASH
+  FLASH -->|是| MIX
+  FLASH -->|否| DONE["仅原图"]
+    </pre>
+    <figcaption>图 3 · hitFlash 白染链路：damage 置 hitFlash=1 → 渲染时叠加缓存的白染贴图 → 主循环每步衰减 0.07</figcaption>
+  </figure>
+
+  <section class="notes">
+    <div class="note">
+      <h3>逻辑坐标固定 1280×720</h3>
+      <p>CSS 把画布缩放到 <code>min(100vw, 177.78vh)</code> 保持 16:9；物理与关卡数据永远使用逻辑坐标，DPR 只影响画布分辨率，两者互不干扰。</p>
+    </div>
+    <div class="note">
+      <h3>矢量回退仍在维护</h3>
+      <p>drawBella / drawJiaran / drawNailin / drawPigVector 是完整的矢量手绘实现，贴图加载失败时自动接管；图鉴头像先矢量绘制、贴图就绪后经 <code>Render.ready</code> 重绘为素材图。</p>
+    </div>
+    <div class="note">
+      <h3>drawBird / drawPig 是双用途 API</h3>
+      <p>既服务游戏内实体，也被 main.js 的 <code>drawGalleryPortraits</code> 用作图鉴头像渲染入口 —— 所以 Render 模块必须保持「只依赖传入参数、不依赖 game 状态」的纯度。</p>
+    </div>
+  </section>
+
+  <footer class="page">
+    返回 <a href="index.html">架构总览</a> · 相关页：<a href="entities.html">实体与参数</a> · Rush LJ 项目图wiki
+  </footer>
+</main>
+
+<script src="assets/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose', flowchart: { curve: 'basis', htmlLabels: true } });
+</script>
+</body>
+</html>

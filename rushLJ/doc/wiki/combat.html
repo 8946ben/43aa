@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>伤害与技能 · Rush LJ wiki</title>
+<link rel="stylesheet" href="assets/wiki.css" />
+</head>
+<body>
+<nav class="top">
+  <span class="brand">Rush LJ wiki</span>
+  <a href="index.html">架构总览</a>
+  <a href="modules.html">模块与加载</a>
+  <a href="main-loop.html">主循环与回合</a>
+  <a class="here" href="combat.html">伤害与技能</a>
+  <a href="entities.html">实体与参数</a>
+  <a href="rendering.html">渲染管线</a>
+  <a href="levels.html">关卡数据</a>
+  <span class="updated">最后更新：2026-10-02</span>
+</nav>
+
+<main>
+  <header class="page">
+    <h1>伤害结算与角色技能</h1>
+    <p class="lead">伤害有三条通路：碰撞冲量伤害（collisionStart 事件）、碾压伤害（每步扫描接触对）、爆炸蛋（独立结算）。三者的终点都是 <code>Entities.damage(body, amount)</code>。</p>
+  </header>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart TB
+  EV["Matter Events<br/>engine 'collisionStart'"]
+  EGGCHK{"任一方是<br/>gameType='egg'<br/>且不是本体？"}
+  BOOM["explodeEgg(egg)<br/>见下图"]
+  REL["rel = 两刚体相对速度<br/>Vector.sub(a.v, b.v) 取模"]
+  MIN{"rel ≥ dmgMinSpeed=4？"}
+  DMG["dmg = (rel − 4) × 7.5<br/>对非静态双方调用 Entities.damage"]
+  CRUSH["applyCrush() 每固定步长执行：<br/>接触对中一方是 pig、另一方更重<br/>且在上方（y 更小）、质量比 ≥ 3.5<br/>→ pig 按 ratio×0.5 持续掉血"]
+
+  EV --> EGGCHK
+  EGGCHK -->|是| BOOM
+  EGGCHK -->|否| REL --> MIN
+  MIN -->|是| DMG
+  MIN -->|否| NEXT["跳过该 pair"]
+  P1["Engine.update 之后"] --> CRUSH
+
+  click DMG "entities.html" _self
+    </pre>
+    <figcaption>图 1 · 伤害三通路：碰撞冲量（事件驱动）+ 碾压（主循环逐帧）+ 爆炸蛋（事件触发）</figcaption>
+  </figure>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart TB
+  HIT["蛋碰到任何非本体刚体"]
+  D["dead=true 防重复引爆"]
+  ALLB["遍历 Composite.allBodies"]
+  R{"距离 d ≤ 110？"}
+  D2["按 (1 − d/110) × 46 扣血"]
+  BIRD{"是 bird？"}
+  IMP["非 bird 加冲击波速度<br/>k = (1 − d/110) × 5 沿径向"]
+
+  HIT --> D --> ALLB --> R
+  R -->|否| OUT["不受影响"]
+  R -->|是| D2 --> BIRD
+  BIRD -->|是| OUT
+  BIRD -->|否| IMP
+    </pre>
+    <figcaption>图 2 · 乃琳的爆炸蛋：范围 110px，伤害与击退都按距离线性衰减；鸟没有血量只吃击退</figcaption>
+  </figure>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart LR
+  TAP["飞行中点按画布<br/>tryUseSkill()"]
+  GUARD{"state='flying'<br/>且 skillUsed=false？"}
+  SK{"BIRD_SKILL[skin]"}
+
+  SPEAR["bella · 飞矛<br/>锁定当前方向速度拉满 =30<br/>角速度清零、角度对齐方向<br/>杆式直线弹道"]
+  SPLIT["jiaran · 一分为三<br/>沿飞行方向 ±30° 各分出一只<br/>同速分身，进 clones 数组<br/>不占回合数，下一轮统一清场"]
+  EGG["nailin · 投蛋<br/>蛋：初速 0.4×v + 下坠 7<br/>本体：0.55×v + 上抛 −7.5<br/>同时只存在一颗 game.egg"]
+
+  TAP --> GUARD
+  GUARD -->|否| IGNORE["忽略（瞄准时点按归弹弓处理）"]
+  GUARD -->|是| SK
+  SK -->|spear| SPEAR
+  SK -->|split| SPLIT
+  SK -->|egg| EGG
+    </pre>
+    <figcaption>图 3 · 三位角色的主动技能（发射后点按触发一次，skillUsed 限流）</figcaption>
+  </figure>
+
+  <section class="notes">
+    <div class="note">
+      <h3>为什么需要碾压伤害</h3>
+      <p>冲量伤害只看撞击瞬间速度，被结构压住的牛速度接近 0，永远打不死。碾压判定补上「更重的刚体压在上方就持续掉血」，还原愤怒的小鸟里「塌方压死猪」的手感。</p>
+    </div>
+    <div class="note">
+      <h3>受击反馈</h3>
+      <p><code>damage()</code> 扣血同时把 <code>hitFlash</code> 置 1，主循环每步按 0.07 衰减；渲染层据此叠白染贴图（见 <a href="rendering.html">渲染管线</a>）。</p>
+    </div>
+    <div class="note">
+      <h3>鸟与蛋是「无血」实体</h3>
+      <p><code>Entities.damage</code> 对 gameType 为 bird / egg 的调用直接忽略——鸟不会被牛撞死，蛋走独立爆炸结算，不参与血量模型。</p>
+    </div>
+  </section>
+
+  <footer class="page">
+    返回 <a href="index.html">架构总览</a> · 相关页：<a href="entities.html">实体与参数</a> · Rush LJ 项目图wiki
+  </footer>
+</main>
+
+<script src="assets/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose', flowchart: { curve: 'basis', htmlLabels: true } });
+</script>
+</body>
+</html>

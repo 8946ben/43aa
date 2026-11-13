@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rush LJ · 项目图wiki</title>
+<link rel="stylesheet" href="assets/wiki.css" />
+</head>
+<body>
+<nav class="top">
+  <span class="brand">Rush LJ wiki</span>
+  <a class="here" href="index.html">架构总览</a>
+  <a href="modules.html">模块与加载</a>
+  <a href="main-loop.html">主循环与回合</a>
+  <a href="combat.html">伤害与技能</a>
+  <a href="entities.html">实体与参数</a>
+  <a href="rendering.html">渲染管线</a>
+  <a href="levels.html">关卡数据</a>
+  <span class="updated">最后更新：2026-10-02</span>
+</nav>
+
+<main>
+  <header class="page">
+    <h1>架构总览</h1>
+    <p class="lead">Rush LJ 是一个纯静态弹弓物理小游戏：无构建工具、无 dev server，浏览器直接打开 <code>index.html</code> 即玩。物理由 Matter.js 驱动，画面全部走 Canvas 2D 自绘。下图即全站目录 —— 图中每个模块节点都可以点击跳转到对应详情页。</p>
+  </header>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart TB
+  subgraph ENTRY["入口层 · index.html"]
+    HTML["index.html<br/>DOM 结构 / HUD 计数 / 主菜单 / 角色图鉴<br/>弹弓画布 #game + 内联 CSS"]
+  end
+
+  subgraph CORE["主循环与物理层 · js/main.js"]
+    MAIN["main.js（IIFE）<br/>boot 装配 / frame 定步长循环<br/>game 全局状态 / 回合推进<br/>碰撞结算 / 胜负判定 / HUD 装配"]
+    MATTER["Matter.js 0.20.0<br/>Engine / Composite / Bodies<br/>Body / Events / Vector"]
+  end
+
+  subgraph MODULES["玩法与表现模块 · js/"]
+    SLING["slingshot.js<br/>Slingshot<br/>拖拽瞄准 / 松手发射 / 轨迹预测"]
+    ENT["entities.js<br/>Entities<br/>实体工厂 / 血量与伤害模型"]
+    REND["render.js<br/>Render<br/>精灵贴图加载 / Canvas 2D 全画面绘制"]
+  end
+
+  subgraph DATA["数据与资源层"]
+    LVL["level.js<br/>LEVELS 共 8 关<br/>纯数据驱动，无逻辑代码"]
+    ASSETS["assets/<br/>bella.png / jiaran.png<br/>nailin.png / niuniu.png"]
+  end
+
+  subgraph EXT["外部依赖"]
+    CDN["jsDelivr CDN<br/>matter.min.js（需联网）"]
+  end
+
+  HTML -->|"&lt;script&gt; 按序加载 5 个模块"| MAIN
+  CDN ==加载==> MATTER
+  MAIN <==每帧 Engine.update===> MATTER
+  MAIN -->|"Entities.createBird / createBlock / damage / decayFlash"| ENT
+  MAIN -->|"startLevel 读取关卡"| LVL
+  MAIN -->|"Render.draw(ctx, game) 每帧调用"| REND
+  SLING -->|"init(canvas, game, launch) 瞄准输入"| MAIN
+  SLING -->|"轨迹预测读取 BIRD.frictionAir"| ENT
+  REND -->|"精灵贴图"| ASSETS
+  MAIN -->|"tryUseSkill / currentSkin 技能与轮换"| ENT
+
+  click HTML "../../index.html" "打开游戏本体" _self
+  click MAIN "main-loop.html" "主循环与回合详情" _self
+  click SLING "modules.html" "模块与加载详情" _self
+  click ENT "entities.html" "实体与参数详情" _self
+  click REND "rendering.html" "渲染管线详情" _self
+  click LVL "levels.html" "关卡数据详情" _self
+    </pre>
+    <figcaption>图 1 · Rush LJ 全项目架构：入口层 → 主循环/物理层 → 模块层 → 数据资源层 → 外部依赖（节点可点击进入详情页）</figcaption>
+  </figure>
+
+  <section class="notes">
+    <div class="note">
+      <h3>一句话架构</h3>
+      <p>main.js 是唯一的状态拥有者：它创建 Matter 引擎与 <code>game</code> 对象，其余四个模块（level / entities / slingshot / render）都是无状态的服务方，围绕 <code>game</code> 与引擎单向协作，互相之间几乎不通信。</p>
+    </div>
+    <div class="note">
+      <h3>关键决策</h3>
+      <p>瞄准阶段不进物理世界 —— 皮兜里的角色只是渲染预览，发射瞬间才调用 <code>Entities.createBird</code> 创建刚体，完全避开 Matter 静态体反复切换的抖动问题（见 <a href="modules.html">模块与加载</a>）。</p>
+    </div>
+    <div class="note">
+      <h3>玩法属性挂在刚体上</h3>
+      <p><code>gameType / hp / skin / dead / hitFlash</code> 等玩法字段直接写在 Matter body 上，渲染与主循环按字段判定，不维护 ID 映射表（见 <a href="entities.html">实体与参数</a>）。</p>
+    </div>
+    <div class="note">
+      <h3>运行环境注意</h3>
+      <p>Matter.js 走 jsDelivr CDN，游戏本体<strong>需要联网</strong>；本 wiki 的 mermaid 已本地化到 <code>assets/mermaid.min.js</code>，双击即可离线阅读。</p>
+    </div>
+  </section>
+
+  <footer class="page">
+    Rush LJ 项目图wiki · 与代码同步维护 · 图与实现不符时先改图再改代码
+  </footer>
+</main>
+
+<script src="assets/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: { curve: 'basis', htmlLabels: true }
+  });
+</script>
+</body>
+</html>

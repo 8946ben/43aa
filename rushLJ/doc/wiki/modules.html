@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>模块与加载 · Rush LJ wiki</title>
+<link rel="stylesheet" href="assets/wiki.css" />
+</head>
+<body>
+<nav class="top">
+  <span class="brand">Rush LJ wiki</span>
+  <a href="index.html">架构总览</a>
+  <a class="here" href="modules.html">模块与加载</a>
+  <a href="main-loop.html">主循环与回合</a>
+  <a href="combat.html">伤害与技能</a>
+  <a href="entities.html">实体与参数</a>
+  <a href="rendering.html">渲染管线</a>
+  <a href="levels.html">关卡数据</a>
+  <span class="updated">最后更新：2026-10-02</span>
+</nav>
+
+<main>
+  <header class="page">
+    <h1>模块与加载</h1>
+    <p class="lead">五个 JS 文件全部是无打包的普通 <code>&lt;script&gt;</code>，加载顺序即依赖顺序；除 Matter 外每个文件只暴露一个全局对象（<code>LEVELS / Entities / Slingshot / Render</code>），main.js 是唯一组装者。</p>
+  </header>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart LR
+  M0["matter.min.js<br/>CDN 全局 Matter"]
+  M1["level.js<br/>全局 LEVELS（8 关数据）"]
+  M2["entities.js<br/>全局 Entities<br/>Matter.Bodies"]
+  M3["slingshot.js<br/>全局 Slingshot<br/>Matter.Vector"]
+  M4["render.js<br/>全局 Render<br/>Image 预加载 assets/"]
+  M5["main.js（IIFE）<br/>解构 Matter 六件套<br/>唯一拥有 game 状态"]
+
+  M0 --> M5
+  M1 --> M5
+  M2 --> M3
+  M2 --> M4
+  M2 --> M5
+  M3 --> M5
+  M4 --> M5
+
+  click M2 "entities.html" _self
+  click M4 "rendering.html" _self
+  click M5 "main-loop.html" _self
+    </pre>
+    <figcaption>图 1 · 脚本加载顺序（index.html 中从上到下）与依赖方向：箭头 A → B 表示 B 依赖 A</figcaption>
+  </figure>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant DOM as index.html
+  participant Main as main.js boot()
+  participant Sl as Slingshot
+  participant R as Render
+  participant UI as HUD/菜单 DOM
+
+  DOM->>Main: DOMContentLoaded 后调用 boot()
+  Main->>Main: resizeCanvas()（DPR ≤ 2）
+  Main->>Main: buildStatics() 地面 + 左墙
+  Main->>Main: startLevel(hash 指定或第 1 关)
+  Main->>Sl: init(canvas, game, launch)
+  Main->>Main: canvas pointerdown → tryUseSkill
+  Main->>R: 读取精灵预加载状态
+  Main->>UI: buildMenu() 生成选关按钮
+  Main->>R: Render.ready(drawGalleryPortraits)
+  Main->>Main: requestAnimationFrame(frame)
+  alt 无 hash 深链
+    Main->>UI: showMenu() 停在主菜单（第 1 关当背景）
+  end
+    </pre>
+    <figcaption>图 2 · 启动时序：boot() 的一次性装配；hash 深链 <code>index.html#3</code> 可直达第 3 关</figcaption>
+  </figure>
+
+  <section class="notes">
+    <div class="note">
+      <h3>模块契约一览</h3>
+      <table class="spec">
+        <tr><th>全局</th><th>暴露 API</th><th>被谁调用</th></tr>
+        <tr><td><code>LEVELS</code></td><td>纯数组，无方法</td><td>main.js（选关菜单 / startLevel / HUD）</td></tr>
+        <tr><td><code>Entities</code></td><td>createBlock / createPig / createEgg / createBird / damage / decayFlash + 常量</td><td>main.js、slingshot.js（轨迹预测）、render.js（图鉴）、main.js 图鉴</td></tr>
+        <tr><td><code>Slingshot</code></td><td>init / computeTrajectory / resetPouch</td><td>main.js</td></tr>
+        <tr><td><code>Render</code></td><td>draw / drawBird / drawPig / drawSpriteCentered / ready</td><td>main.js（帧循环 + 图鉴）</td></tr>
+      </table>
+    </div>
+    <div class="note">
+      <h3>瞄准不进物理世界</h3>
+      <p>Slingshot 拖拽时只改 <code>game.previewBird</code>（普通对象）与 <code>game.pull</code>，松手超过 14px 才回调 <code>launch(velocity)</code> 创建真刚体。这是为了避免 Matter 静态体反复增删造成的抖动。</p>
+    </div>
+    <div class="note">
+      <h3>输入绑定的两个来源</h3>
+      <p>同一画布 <code>pointerdown</code> 有两个监听：Slingshot 内部处理瞄准拖拽（state 为 aiming 时生效），main.js 的 <code>tryUseSkill</code> 处理技能释放（state 为 flying 时生效）——靠 <code>game.state</code> 天然互斥。</p>
+    </div>
+  </section>
+
+  <footer class="page">
+    返回 <a href="index.html">架构总览</a> · Rush LJ 项目图wiki
+  </footer>
+</main>
+
+<script src="assets/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose', flowchart: { curve: 'basis', htmlLabels: true } });
+</script>
+</body>
+</html>

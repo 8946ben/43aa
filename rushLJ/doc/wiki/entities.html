@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>实体与参数 · Rush LJ wiki</title>
+<link rel="stylesheet" href="assets/wiki.css" />
+</head>
+<body>
+<nav class="top">
+  <span class="brand">Rush LJ wiki</span>
+  <a href="index.html">架构总览</a>
+  <a href="modules.html">模块与加载</a>
+  <a href="main-loop.html">主循环与回合</a>
+  <a href="combat.html">伤害与技能</a>
+  <a class="here" href="entities.html">实体与参数</a>
+  <a href="rendering.html">渲染管线</a>
+  <a href="levels.html">关卡数据</a>
+  <span class="updated">最后更新：2026-10-02</span>
+</nav>
+
+<main>
+  <header class="page">
+    <h1>实体工厂与参数模型</h1>
+    <p class="lead">Entities 只做两件事：按常量表造刚体、提供 damage / decayFlash 两个通用结算函数。玩法属性直接挂在 Matter body 上，全项目没有第二套实体数据结构。</p>
+  </header>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart TB
+  subgraph FACT["Entities 工厂函数"]
+    CB["createBlock(def)<br/>矩形，material 决定常量"]
+    CP["createPig(x,y)<br/>圆 r=18"]
+    CE["createEgg(x,y)<br/>圆 r=7"]
+    CBIRD["createBird(x,y,skin)<br/>圆 r=19"]
+  end
+
+  subgraph FIELDS["所有实体共享的挂载字段"]
+    F["gameType（类型判定）<br/>hp / maxHp（bird 与 egg 无）<br/>hitFlash（受击白光 0→1→0）<br/>dead（死亡标记）<br/>skin / skillUsed（仅 bird）"]
+  end
+
+  subgraph DMG["结算函数"]
+    DA["damage(body, amount)<br/>bird/egg 直接忽略<br/>hp≤0 时 dead=true"]
+    DF["decayFlash(body, 0.07)<br/>每固定步长由主循环调用"]
+  end
+
+  CB --> F
+  CP --> F
+  CE --> F
+  CBIRD --> F
+  DA --> F
+  DF --> F
+    </pre>
+    <figcaption>图 1 · 实体模型：工厂产出带玩法字段的 Matter body，damage / decayFlash 操作这些字段</figcaption>
+  </figure>
+
+  <figure class="diagram">
+    <pre class="mermaid">
+flowchart LR
+  MAT["MATERIALS 常量表"]
+  W["wood 木头<br/>hp 45 · density 0.0022<br/>restitution 0.12 · friction 0.65"]
+  S["stone 石头<br/>hp 88 · density 0.0055<br/>restitution 0.08 · friction 0.85"]
+  MAT --> W
+  MAT --> S
+
+  PIG["PIG 牛牛<br/>r 18 · hp 25 · density 0.0016"]
+  BIRD["BIRD 我方角色（三皮肤共用物理）<br/>r 19 · density 0.005 · restitution 0.45"]
+  EGG["EGG 乃琳的蛋<br/>r 7 · density 0.004"]
+    </pre>
+    <figcaption>图 2 · 五类实体常量：方块材质二选一（hp 差近一倍），牛牛轻脆、角色重弹、蛋轻小</figcaption>
+  </figure>
+
+  <section class="notes">
+    <div class="note">
+      <h3>角色皮肤与技能表</h3>
+      <table class="spec">
+        <tr><th>skin</th><th>角色</th><th>skill 键</th><th>效果（发射后点按）</th></tr>
+        <tr><td><code>bella</code></td><td>贝拉</td><td><code>spear</code></td><td>锁定方向速度拉满 30，直线扎穿</td></tr>
+        <tr><td><code>jiaran</code></td><td>嘉然</td><td><code>split</code></td><td>±30° 分出两只同速分身，横向扫射</td></tr>
+        <tr><td><code>nailin</code></td><td>乃琳</td><td><code>egg</code></td><td>投下爆炸蛋，本体向上弹开</td></tr>
+      </table>
+      <p>出场顺序按弹数轮换 <code>['bella','jiaran','nailin']</code>；皮肤只影响外观与技能，物理参数三 skins 共用 <code>BIRD</code>。</p>
+    </div>
+    <div class="note">
+      <h3>设计要点</h3>
+      <p>牛牛 hp 只有 25：一发直击（相对速度约 8+）即可带走，设计上鼓励「打结构靠塌方压，打露天牛靠直击」两种解法。</p>
+      <p>方块掉落 <code>frictionAir 0.006</code> 明显高于角色（0.0008），让坍塌尽快沉降、缩短回合等待。</p>
+    </div>
+    <div class="note">
+      <h3>damage 的边界</h3>
+      <p>返回 true 表示「这一击打死了」；目前主循环不消费返回值（死亡统一由 sweepDead 回收），但保留该约定便于扩展连击计分。</p>
+    </div>
+  </section>
+
+  <footer class="page">
+    返回 <a href="index.html">架构总览</a> · 相关页：<a href="combat.html">伤害与技能</a> · Rush LJ 项目图wiki
+  </footer>
+</main>
+
+<script src="assets/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose', flowchart: { curve: 'basis', htmlLabels: true } });
+</script>
+</body>
+</html>
