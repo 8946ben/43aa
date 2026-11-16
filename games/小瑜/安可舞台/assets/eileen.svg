@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="乃琳">
+  <circle cx="60" cy="64" r="36" fill="#f4e9e2"/>
+  <path d="M22 70q-4-44 38-44t38 44q-2-20-12-26-2 10-10 12 0-14-16-14t-16 14q-8-2-10-12-10 6-12 26z" fill="#7fa8ff"/>
+  <path d="M22 64q-6 18 0 34l8-2q-6-16-2-32z" fill="#7fa8ff"/>
+  <path d="M98 64q6 18 0 34l-8-2q6-16 2-32z" fill="#7fa8ff"/>
+  <path d="M42 62q6-4 12 0" fill="none" stroke="#5a7fd6" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M66 62q6-4 12 0" fill="none" stroke="#5a7fd6" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="48" cy="66" r="4.5" fill="#2c3a66"/>
+  <circle cx="72" cy="66" r="4.5" fill="#2c3a66"/>
+  <circle cx="49.5" cy="64.5" r="1.6" fill="#fff"/>
+  <circle cx="73.5" cy="64.5" r="1.6" fill="#fff"/>
+  <path d="M54 79q6 5 12 0" fill="none" stroke="#b08a80" stroke-width="3" stroke-linecap="round"/>
+  <path d="M90 30l4 8 8 4-8 4-4 8-4-8-8-4 8-4z" fill="#bfe0ff"/>
+  <circle cx="38" cy="76" r="4.5" fill="#f0c0b8" opacity="0.7"/>
+  <circle cx="82" cy="76" r="4.5" fill="#f0c0b8" opacity="0.7"/>
+</svg>

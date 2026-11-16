@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="嘉然">
+  <circle cx="60" cy="64" r="36" fill="#ffeadf"/>
+  <path d="M22 68q-4-42 38-42t38 42q-4-16-14-22 0 10-8 14-4-14-16-14t-16 14q-8-4-8-14-10 6-14 22z" fill="#ff9ecb"/>
+  <path d="M20 60q-8 4-6 18 2 10 8 12l4-6q-6-4-6-12 0-6 4-8z" fill="#ff9ecb"/>
+  <path d="M100 60q8 4 6 18-2 10-8 12l-4-6q6-4 6-12 0-6-4-8z" fill="#ff9ecb"/>
+  <path d="M58 24q2-8 8-10-2 6 2 8" fill="none" stroke="#ff9ecb" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="48" cy="64" r="5.5" fill="#54283c"/>
+  <circle cx="72" cy="64" r="5.5" fill="#54283c"/>
+  <circle cx="50" cy="62" r="2" fill="#fff"/>
+  <circle cx="74" cy="62" r="2" fill="#fff"/>
+  <path d="M52 78q8 8 16 0" fill="none" stroke="#d97ba6" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M88 34c3-4 9-2 9 3 0 4-5 7-9 10-4-3-9-6-9-10 0-5 6-7 9-3z" fill="#ff5f9e"/>
+  <circle cx="37" cy="75" r="5.5" fill="#ffc0d8" opacity="0.9"/>
+  <circle cx="83" cy="75" r="5.5" fill="#ffc0d8" opacity="0.9"/>
+</svg>

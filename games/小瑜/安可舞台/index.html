@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>安可舞台 ENCORE STAGE · 枝江节奏夜</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="assets/bella.svg" type="image/svg+xml">
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════ 选曲屏幕 ══════════ -->
+  <section id="screen-select" class="screen">
+    <div class="sel-bg" aria-hidden="true"><i></i><i></i><i></i></div>
+    <header class="sel-head">
+      <div class="logo">
+        <div class="logo-cn">安可舞台</div>
+        <div class="logo-en">ENCORE&nbsp;STAGE</div>
+        <div class="logo-sub">枝江节奏夜 · 一面太鼓、两种鼓点，为她们敲响整场安可</div>
+      </div>
+      <div class="head-side">
+        <img class="mascot" src="assets/acao.svg" alt="阿草">
+        <button id="btn-mute-sel" class="icon-btn" title="静音 (M)" aria-label="静音">
+          <svg viewBox="0 0 24 24" class="ic-on"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 24 24" class="ic-off"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="sel-body">
+      <div class="song-list" id="song-list"><!-- 曲目卡片由 JS 生成 --></div>
+
+      <aside class="sel-side">
+        <div class="panel">
+          <div class="panel-title">难度</div>
+          <div class="seg" id="seg-diff">
+            <button data-diff="EZ" class="seg-btn">EZ<span>轻松</span></button>
+            <button data-diff="NM" class="seg-btn active">NM<span>标准</span></button>
+            <button data-diff="HD" class="seg-btn">HD<span>狂热</span></button>
+          </div>
+          <div class="diff-note" id="diff-note">标准难度 · 跟随主旋律的完整光轨</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">舞台调校</div>
+          <label class="slider-row">
+            <span class="sl-label">音符速度</span>
+            <input type="range" id="sl-speed" min="10" max="30" step="1" value="18">
+            <span class="sl-val" id="val-speed">1.8×</span>
+          </label>
+          <label class="slider-row">
+            <span class="sl-label">判定延迟</span>
+            <input type="range" id="sl-offset" min="-150" max="150" step="5" value="0">
+            <span class="sl-val" id="val-offset">0ms</span>
+          </label>
+          <label class="slider-row">
+            <span class="sl-label">音量</span>
+            <input type="range" id="sl-volume" min="0" max="100" step="1" value="80">
+            <span class="sl-val" id="val-volume">80</span>
+          </label>
+          <div class="offset-hint">总觉得按早了才判定到？把延迟往 + 调；反之往 − 调。</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">操作</div>
+          <div class="key-guide" id="key-guide"><!-- JS 生成五色键位 --></div>
+          <div class="key-hint">触屏：左半屏敲鼓面、右半屏敲鼓边 · <kbd>P</kbd> 暂停 · <kbd>M</kbd> 静音 · <kbd>R</kbd> 重开</div>
+        </div>
+
+        <button id="btn-start" class="btn-start">
+          <span class="start-cn">开 演</span>
+          <span class="start-en">START LIVE</span>
+        </button>
+      </aside>
+    </div>
+
+    <footer class="sel-foot">A-SOUL 同人作品 · 非商用 · 曲目为 WebAudio 原创合成音源 · 最高分保存在本机浏览器</footer>
+  </section>
+
+  <!-- ══════════ 演奏屏幕 ══════════ -->
+  <section id="screen-game" class="screen hidden">
+    <canvas id="stage"></canvas>
+    <div id="hud">
+      <div class="hud-left">
+        <div class="hud-song"><span id="hud-title">夜航星</span><span class="hud-diff" id="hud-diff">NM</span></div>
+        <div class="hud-progress"><i id="hud-progress-fill"></i></div>
+      </div>
+      <div class="hud-center">
+        <div class="hype-wrap">
+          <span class="hype-label">热情</span>
+          <div class="hype-bar"><i id="hype-fill"></i><b id="hype-encore-mark"></b></div>
+          <span class="hype-state" id="hype-state">READY</span>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-score" id="hud-score">0</div>
+        <div class="hud-acc" id="hud-acc">100.00%</div>
+      </div>
+      <div class="hud-btns">
+        <button id="btn-mute-game" class="icon-btn" title="静音 (M)" aria-label="静音">
+          <svg viewBox="0 0 24 24" class="ic-on"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 24 24" class="ic-off"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button id="btn-pause" class="icon-btn" title="暂停 (P)" aria-label="暂停">
+          <svg viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="fever-banner" class="hidden"><span>ENCORE!!</span><em>安可狂热 · 得分 ×2</em></div>
+    <div id="countdown" class="hidden"></div>
+  </section>
+
+  <!-- ══════════ 暂停浮层 ══════════ -->
+  <div id="overlay-pause" class="overlay hidden">
+    <div class="ov-card pause-card">
+      <h2 class="ov-title">幕间休息</h2>
+      <div class="pause-song" id="pause-song">夜航星 · NM</div>
+      <div class="pause-btns">
+        <button id="btn-resume" class="btn primary">继续演出 <kbd>P</kbd></button>
+        <button id="btn-restart-p" class="btn">重新开始 <kbd>R</kbd></button>
+        <button id="btn-quit-p" class="btn ghost">返回选曲</button>
+      </div>
+      <div class="pause-sliders">
+        <label class="slider-row">
+          <span class="sl-label">音量</span>
+          <input type="range" id="sl-volume-p" min="0" max="100" step="1" value="80">
+          <span class="sl-val" id="val-volume-p">80</span>
+        </label>
+        <label class="slider-row">
+          <span class="sl-label">判定延迟</span>
+          <input type="range" id="sl-offset-p" min="-150" max="150" step="5" value="0">
+          <span class="sl-val" id="val-offset-p">0ms</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ 结算浮层 ══════════ -->
+  <div id="overlay-result" class="overlay hidden">
+    <div class="ov-card result-card">
+      <div class="res-head">
+        <div class="res-clear" id="res-clear">STAGE CLEAR</div>
+        <div class="res-song" id="res-song">夜航星 · NM</div>
+      </div>
+      <div class="res-main">
+        <div class="rank-wrap">
+          <div class="rank" id="res-rank">S</div>
+          <div class="rank-ring" aria-hidden="true"></div>
+        </div>
+        <div class="res-score-wrap">
+          <div class="res-score" id="res-score">0</div>
+          <div class="res-newrecord hidden" id="res-newrecord">★ NEW RECORD ★</div>
+          <div class="res-acc">准确率 <b id="res-acc">100.00%</b> · 最大连击 <b id="res-combo">0</b></div>
+        </div>
+      </div>
+      <div class="res-judge" id="res-judge">
+        <div class="jrow j-p"><span>PERFECT</span><div class="jbar"><i></i></div><b>0</b></div>
+        <div class="jrow j-g"><span>GREAT</span><div class="jbar"><i></i></div><b>0</b></div>
+        <div class="jrow j-ok"><span>GOOD</span><div class="jbar"><i></i></div><b>0</b></div>
+        <div class="jrow j-m"><span>MISS</span><div class="jbar"><i></i></div><b>0</b></div>
+      </div>
+      <div class="res-quote">
+        <img id="res-quote-face" src="assets/bella.svg" alt="">
+        <div class="quote-bubble"><b id="res-quote-name">贝拉</b><p id="res-quote-text">这舞台，满分！</p></div>
+      </div>
+      <div class="res-btns">
+        <button id="btn-retry" class="btn primary">再来一次 <kbd>R</kbd></button>
+        <button id="btn-back" class="btn">返回选曲 <kbd>Esc</kbd></button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="js/songs.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

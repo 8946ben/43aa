@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="心宜">
+  <circle cx="60" cy="64" r="36" fill="#ffe6dc"/>
+  <path d="M22 68q-4-42 38-42t38 42q-4-18-16-22 2 10-6 14-6-14-16-14t-16 14q-8-4-6-14-12 4-16 22z" fill="#ff4f9a"/>
+  <path d="M92 40q14-2 16 12 2 12-8 18l-4-6q6-6 4-12-2-6-8-6z" fill="#ff4f9a"/>
+  <circle cx="48" cy="64" r="5" fill="#4d1f33"/>
+  <circle cx="72" cy="64" r="5" fill="#4d1f33"/>
+  <circle cx="50" cy="62" r="1.8" fill="#fff"/>
+  <circle cx="74" cy="62" r="1.8" fill="#fff"/>
+  <path d="M48 78q12 10 24 0" fill="none" stroke="#d1568c" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M30 30l-8 12h7l-5 12 14-15h-8l7-9z" fill="#ffe14d"/>
+  <circle cx="38" cy="75" r="5" fill="#ffb0c8" opacity="0.85"/>
+  <circle cx="82" cy="75" r="5" fill="#ffb0c8" opacity="0.85"/>
+</svg>
